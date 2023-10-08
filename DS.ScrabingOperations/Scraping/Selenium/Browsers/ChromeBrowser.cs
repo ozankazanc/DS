@@ -10,13 +10,14 @@ using System.Threading.Tasks;
 
 namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
 {
-    public class ChromeBrowser : IBrowser<ChromeDriver>
+    public class ChromeBrowser : IBrowser<ChromeDriver>, IScraping
     {
         public ChromeDriver driver = null;
 
         public ChromeBrowser()
         {
             driver = new ChromeDriver(GetDriverService(), GetBrowserOptions());
+            //driver = new ChromeDriver(GetDriverService());
         }
 
         public ChromeDriver GetDriver()
@@ -29,6 +30,7 @@ namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
             driver.Navigate().GoToUrl(url);
             return driver;
         }
+
         public ChromeDriver GetDriver(string url, int waitSecond)
         {
             driver.Navigate().GoToUrl(url);
@@ -55,11 +57,76 @@ namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
 
             return options;
         }
+
         public void CloseDriver()
         {
             driver.Close();
         }
 
-       
+        #region Scraping
+        public IWebElement GetElementByXPath(string xPath)
+        {
+            return driver.FindElement(By.XPath(xPath));
+        }
+
+        public IList<IWebElement> GetElementsByXPath(string xPath)
+        {
+            return driver.FindElements(By.XPath(xPath));
+        }
+
+        public IWebElement GetElementByXPath(string xPath, IWebElement webElement)
+        {
+            return webElement.FindElement(By.XPath(xPath));
+        }
+
+        public IList<IWebElement> GetElementsByXPath(string xPath, IWebElement webElement)
+        {
+            return webElement.FindElements(By.XPath(xPath));
+        }
+
+        public IWebElement GetElementByTagName(string tagName)
+        {
+            return driver.FindElement(By.TagName(tagName));
+        }
+
+        public IList<IWebElement> GetElementsByTagName(string tagName)
+        {
+            return driver.FindElements(By.TagName(tagName));
+        }
+
+        public IWebElement GetElementByTagName(string tagName, IWebElement webElement)
+        {
+            return webElement.FindElement(By.TagName(tagName));
+        }
+
+        public IList<IWebElement> GetElementsByTagName(string tagName, IWebElement webElement)
+        {
+            return webElement.FindElements(By.TagName(tagName));
+        }
+
+        public IWebElement GetElementByClassName(string className)
+        {
+            return driver.FindElement(By.ClassName(className));
+        }
+
+        public IList<IWebElement> GetElementsByClassName(string className)
+        {
+            return driver.FindElements(By.ClassName(className));
+        }
+
+        public IWebElement GetElementByClassName(string className, IWebElement webElement)
+        {
+            return webElement.FindElement(By.ClassName(className));
+        }
+
+        public IList<IWebElement> GetElementsByClassName(string className, IWebElement webElement)
+        {
+            return webElement.FindElements(By.ClassName(className));
+        }
+
+        #endregion
+
+
+
     }
 }

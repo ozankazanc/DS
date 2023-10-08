@@ -62,7 +62,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\KeyValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scraping\HtmlTags.cs" />
     <Compile Include="Scraping\IScraping.cs" />
     <Compile Include="Scraping\Selenium\Browsers\ChromeBrowser.cs" />
     <Compile Include="Scraping\Selenium\Browsers\IBrowser.cs" />
