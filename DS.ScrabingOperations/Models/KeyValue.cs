@@ -7,17 +7,20 @@ using System.Threading.Tasks;
 namespace DS.ScrabingOperations.Models
 {
 
-    public class DataOption
+    public class DataInformation
     {
-        public ElementOption MainElement { get; set; }
-        public List<ElementOption> SubElements { get; set; }
+        public ElementInformation MainElement { get; set; }
+        public ElementInformation SubElements { get; set; }
+        public List<ColumnInformation> ColumnInformations { get; set; }
     }
 
-    public class ElementOption
+    public class ElementInformation : SearchOption
     {
-        public string ElementName { get; set; }
-        public SearchOption SearchOption { get; set; }
 
+    }
+    public class ColumnInformation : SearchOption
+    {
+        public string ColumnName { get; set; }
     }
 
     public class SearchOption

@@ -1,5 +1,6 @@
 ﻿using DS.ConsoleUI.TestCompanies;
 using DS.ScrabingOperations.Scraping.Selenium;
+using DS.ScrabingOperations.Scraping.Selenium.Browsers;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
@@ -16,10 +17,20 @@ namespace DS.ConsoleUI
         {
 
 
-            Trendyol trendyol = new Trendyol();
-            trendyol.TestIslemleri();
+            //Trendyol trendyol = new Trendyol();
+            //trendyol.TestIslemleri();
 
 
+
+
+            // System.Environment.SetEnvironmentVariable("webdriver.chrome.driver", "/path/to/chromedriver");
+
+            ChromeBrowser2 chromeBrowser2 = new ChromeBrowser2();
+
+            Sahibinden sahibinden = new Sahibinden();
+            sahibinden.TestIslemleri();
+
+        
 
 
 
@@ -32,7 +43,7 @@ namespace DS.ConsoleUI
 
             //scrapping.ScrollDown();
 
-         
+
 
             //var getTableXPath = xpath.Substring(0, xpath.LastIndexOf("table") + 5);
 
@@ -43,7 +54,7 @@ namespace DS.ConsoleUI
             //var elementsthead = elementthead.FindElements(By.TagName("th"));
 
 
-          
+
 
 
             //foreach (var ele in elementsthead)
@@ -64,7 +75,7 @@ namespace DS.ConsoleUI
             //var k = element.GetAttribute("href");
 
 
-            
+
         }
 
 

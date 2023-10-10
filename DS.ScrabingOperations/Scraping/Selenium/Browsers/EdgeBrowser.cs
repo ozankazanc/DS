@@ -1,49 +1,47 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
+﻿using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
 {
-    public class ChromeBrowser : IBrowser<ChromeDriver>, IScraping
+    public class EdgeBrowser : IBrowser<EdgeDriver>, IScraping
     {
-        public ChromeDriver driver = null;
-        private IScraping _scraping = null;
+        public EdgeDriver driver = null;
 
-        public ChromeBrowser()
+        public EdgeBrowser()
         {
-            //_scraping = new Scraping(new ChromeDriver());
             //driver = new ChromeDriver(GetDriverService(), GetBrowserOptions());
-            driver = new ChromeDriver(GetDriverService());
+            driver = new EdgeDriver(GetDriverService());
         }
 
-        public ChromeDriver GetDriver()
+        public EdgeDriver GetDriver()
         {
             return driver;
         }
 
-        public ChromeDriver GetDriver(string url)
+        public EdgeDriver GetDriver(string url)
         {
             driver.Navigate().GoToUrl(url);
             return driver;
         }
 
-        public ChromeDriver GetDriver(string url, int waitSecond)
+        public EdgeDriver GetDriver(string url, int waitSecond)
         {
             driver.Navigate().GoToUrl(url);
             WaitWhileReachingUrl(waitSecond);
             return driver;
         }
 
-        private ChromeDriverService GetDriverService()
+        private EdgeDriverService GetDriverService()
         {
-            ChromeDriverService service = ChromeDriverService.CreateDefaultService();
+            EdgeDriverService service = EdgeDriverService.CreateDefaultService();
             service.HideCommandPromptWindow = true;
             return service;
         }
@@ -56,23 +54,14 @@ namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
         private ChromeOptions GetBrowserOptions()
         {
             var options = new ChromeOptions();
-            //options.AddArgument("--window-position=-32000,-32000");
-            //options.AddArgument("headless");
-            options.DebuggerAddress = "localhost:9222";
+            options.AddArgument("--window-position=-32000,-32000");
+
             return options;
         }
 
         public void CloseDriver()
         {
             driver.Close();
-        }
-
-        /// <summary>
-        /// Run local browser
-        /// </summary>
-        private void RunChromeBrowser()
-        {
-            System.Environment.SetEnvironmentVariable("webdriver.chrome.driver", "E:\\ChromeData\\chromedriver.exe");
         }
 
         #region Scraping
@@ -137,37 +126,5 @@ namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
         }
 
         #endregion
-
-
-
-    }
-
-
-    public class ChromeBrowser2 : ABrowser<ChromeDriver, ChromeDriverService, ChromeOptions>
-    {
-        public ChromeBrowser2()
-        {
-
-        }
-        protected override ChromeDriverService SetDriverSevice()
-        {
-            var service = ChromeDriverService.CreateDefaultService();
-            service.HideCommandPromptWindow = true;
-            return service;
-        }
-
-        protected override ChromeOptions SetOptions()
-        {
-            var options = new ChromeOptions();
-            //options.AddArgument("--window-position=-32000,-32000");
-            //options.AddArgument("headless");
-            options.DebuggerAddress = "localhost:9222";
-            return options;
-        }
-
-        protected override ChromeDriver SetWebDriver()
-        {
-            return new ChromeDriver(SetDriverSevice(),SetOptions());
-        }
     }
 }

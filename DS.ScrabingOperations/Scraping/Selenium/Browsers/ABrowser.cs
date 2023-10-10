@@ -1,52 +1,64 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace DS.ScrabingOperations.Scraping
+namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
 {
-    public interface IScraping
+    public abstract class ABrowser<TWebDriver, TDriverService, TOptions> : IScraping
+        where TWebDriver : WebDriver
     {
-        //xpath
-        IWebElement GetElementByXPath(string xPath);
-        IWebElement GetElementByXPath(string xPath, IWebElement webElement);
-        IList<IWebElement> GetElementsByXPath(string xPath);
-        IList<IWebElement> GetElementsByXPath(string xPath, IWebElement webElement);
-        //tagname
-        IWebElement GetElementByTagName(string tagName);
-        IWebElement GetElementByTagName(string tagName, IWebElement webElement);
-        IList<IWebElement> GetElementsByTagName(string tagName);
-        IList<IWebElement> GetElementsByTagName(string tagName, IWebElement webElement);
-        //classname
-        IWebElement GetElementByClassName(string className);
-        IWebElement GetElementByClassName(string className, IWebElement webElement);
-        IList<IWebElement> GetElementsByClassName(string className);
-        IList<IWebElement> GetElementsByClassName(string className, IWebElement webElement);
-
-    }
-
-    public class Scraping<T> : IScraping where T : IWebDriver, new()
-    {
-        protected IWebDriver _driver;
-        public Scraping()
+        public ABrowser()
         {
-            _driver = new T();
+            
+            
         }
+        protected virtual TWebDriver Driver => SetWebDriver();
+        protected abstract TWebDriver SetWebDriver();
+        protected abstract TDriverService SetDriverSevice();
+        protected abstract TOptions SetOptions();
+        public virtual void WaitWhileReachingUrl(int milisecond)
+        {
+            Thread.Sleep(milisecond);
+        }
+
+        protected IWebDriver GetDriver()
+        {
+            return Driver;
+        }
+        protected IWebDriver GetDriver(string url)
+        {
+            Driver.Navigate().GoToUrl(url);
+            return Driver;
+        }
+        protected IWebDriver GetDriver(string url, int waitSecond)
+        {
+            Driver.Navigate().GoToUrl(url);
+            return Driver;
+        }
+       
+        public void CloseDriver()
+        {
+            _driver.Close();
+        }
+
         public IWebElement GetElementByXPath(string xPath)
         {
-            return _driver.FindElement(By.XPath(xPath));
+            return Driver.FindElement(By.XPath(xPath));
         }
 
         public IList<IWebElement> GetElementsByXPath(string xPath)
         {
-            return _driver.FindElements(By.XPath(xPath));
+            return Driver.FindElements(By.XPath(xPath));
         }
 
         public IWebElement GetElementByXPath(string xPath, IWebElement webElement)
         {
-            return _driver.FindElement(By.XPath(xPath));
+            return Driver.FindElement(By.XPath(xPath));
         }
 
         public IList<IWebElement> GetElementsByXPath(string xPath, IWebElement webElement)
@@ -56,12 +68,12 @@ namespace DS.ScrabingOperations.Scraping
 
         public IWebElement GetElementByTagName(string tagName)
         {
-            return _driver.FindElement(By.TagName(tagName));
+            return Driver.FindElement(By.TagName(tagName));
         }
 
         public IList<IWebElement> GetElementsByTagName(string tagName)
         {
-            return _driver.FindElements(By.TagName(tagName));
+            return Driver.FindElements(By.TagName(tagName));
         }
 
         public IWebElement GetElementByTagName(string tagName, IWebElement webElement)
@@ -76,12 +88,12 @@ namespace DS.ScrabingOperations.Scraping
 
         public IWebElement GetElementByClassName(string className)
         {
-            return _driver.FindElement(By.ClassName(className));
+            return Driver.FindElement(By.ClassName(className));
         }
 
         public IList<IWebElement> GetElementsByClassName(string className)
         {
-            return _driver.FindElements(By.ClassName(className));
+            return Driver.FindElements(By.ClassName(className));
         }
 
         public IWebElement GetElementByClassName(string className, IWebElement webElement)

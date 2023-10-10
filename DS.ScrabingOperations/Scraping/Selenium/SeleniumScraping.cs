@@ -10,6 +10,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DS.ScrabingOperations.Scraping.Selenium
 {
@@ -128,63 +129,94 @@ namespace DS.ScrabingOperations.Scraping.Selenium
             return dataTable;
         }
 
-        public DataTable GetData(DataOption dataOption)
+        public DataTable GetData(DataInformation dataInformation)
         {
             var dataTable = new DataTable();
 
-            IWebElement mainElement = ElementOperationBySearchType(dataOption.MainElement);
-            
+            foreach (var columnInformation in dataInformation.ColumnInformations)
+            {
+                dataTable.Columns.Add(columnInformation.ColumnName, typeof(string));
+            }
 
+            var mainElement = ElementOperationBySearchType(dataInformation);
+            var subElements = SubElementsOperationBySearchType(dataInformation, mainElement);
 
+            foreach (var element in subElements)
+            {
+                var rowValues = new List<string>();
+                var numerator = 0;
+                foreach (var columnInformation in dataInformation.ColumnInformations)
+                {
+                    var value = string.Empty;
+                    switch (columnInformation.SearchType)
+                    {
+                        case SearchType.xPath:
+                            value = element.FindElement(By.XPath(XPathNumerator(ref numerator, columnInformation.SearchValue))).Text;
+                            break;
+                        case SearchType.TagName:
+                            value = element.FindElement(By.TagName(columnInformation.SearchValue)).Text;
+                            break;
+                        case SearchType.ClassName:
+                            value = element.FindElement(By.ClassName(columnInformation.SearchValue)).Text;
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                    rowValues.Add(value);
+                }
+                dataTable.Rows.Add(rowValues);
+            }
 
-
-
+            return dataTable;
         }
 
-        private IWebElement ElementOperationBySearchType(ElementOption elementOption)
+        private IWebElement ElementOperationBySearchType(DataInformation dataInformation)
         {
-            IWebElement mainElement; 
+            IWebElement mainElement;
 
-            switch (elementOption.SearchOption.SearchType)
+            switch (dataInformation.MainElement.SearchType)
             {
                 case SearchType.xPath:
-                    mainElement = _chromeBrowser.GetElementByXPath(elementOption.SearchOption.SearchValue);
+                    mainElement = _chromeBrowser.GetElementByXPath(dataInformation.MainElement.SearchValue);
                     break;
                 case SearchType.TagName:
-                    mainElement = _chromeBrowser.GetElementByTagName(elementOption.SearchOption.SearchValue);
+                    mainElement = _chromeBrowser.GetElementByTagName(dataInformation.MainElement.SearchValue);
                     break;
                 case SearchType.ClassName:
-                    mainElement = _chromeBrowser.GetElementByClassName(elementOption.SearchOption.SearchValue);
+                    mainElement = _chromeBrowser.GetElementByClassName(dataInformation.MainElement.SearchValue);
                     break;
                 default:
                     throw new NotImplementedException();
             }
             return mainElement;
         }
-        private IList<IWebElement> ElementsOperationBySearchType(ElementOption elementOption)
-        {
-            IList<IWebElement> elements;
 
-            switch (elementOption.SearchOption.SearchType)
+        private IList<IWebElement> SubElementsOperationBySearchType(DataInformation dataInformation, IWebElement mainElement)
+        {
+            IList<IWebElement> subElement;
+
+            switch (dataInformation.SubElements.SearchType)
             {
                 case SearchType.xPath:
-                    elements = _chromeBrowser.GetElementsByXPath(elementOption.SearchOption.SearchValue);
+                    subElement = _chromeBrowser.GetElementsByXPath(dataInformation.SubElements.SearchValue, mainElement);
                     break;
                 case SearchType.TagName:
-                    elements = _chromeBrowser.GetElementsByTagName(elementOption.SearchOption.SearchValue);
+                    subElement = _chromeBrowser.GetElementsByTagName(dataInformation.SubElements.SearchValue, mainElement);
                     break;
                 case SearchType.ClassName:
-                    elements = _chromeBrowser.GetElementsByClassName(elementOption.SearchOption.SearchValue);
+                    subElement = _chromeBrowser.GetElementsByClassName(dataInformation.SubElements.SearchValue, mainElement);
                     break;
                 default:
                     throw new NotImplementedException();
             }
-            return elements;
+            return subElement;
         }
 
-        private void XpathNumerator()
+        private string XPathNumerator(ref int num, string xPath)
         {
-
+            num++;
+            var addedNumXpath = xPath.Replace("#x#", num.ToString());
+            return addedNumXpath;
         }
 
 

@@ -5,12 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace DS.ConsoleUI.TestCompanies
 {
     public class Trendyol
     {
-        public string Url = "https://www.trendyol.com/sr?q=xbox&qt=xbox&st=xbox&os=1&pi=2";
+        public string Url ="https://www.sahibinden.com/kiralik/bursa?query_text_mf=bursa+kiralik+ev&query_text=kiralik+ev";
 
         public void TestIslemleri()
         {
