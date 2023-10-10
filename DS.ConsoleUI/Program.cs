@@ -4,7 +4,10 @@ using DS.ScrabingOperations.Scraping.Selenium.Browsers;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -17,20 +20,29 @@ namespace DS.ConsoleUI
         {
 
 
+
+
+
+
+
+
+
             //Trendyol trendyol = new Trendyol();
             //trendyol.TestIslemleri();
+
+
+            Sahibinden sahibinden = new Sahibinden();
+            sahibinden.TestIslemleri();
 
 
 
 
             // System.Environment.SetEnvironmentVariable("webdriver.chrome.driver", "/path/to/chromedriver");
 
-            ChromeBrowser2 chromeBrowser2 = new ChromeBrowser2();
 
-            Sahibinden sahibinden = new Sahibinden();
-            sahibinden.TestIslemleri();
 
-        
+
+
 
 
 

@@ -1,5 +1,7 @@
 ﻿using DS.ScrabingOperations.Models;
 using DS.ScrabingOperations.Scraping.Selenium;
+using DS.ScrabingOperations.Scraping.Selenium.Browsers;
+using DS.ScrabingOperations.Scraping.Selenium.BrowserScraping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,10 @@ namespace DS.ConsoleUI.TestCompanies
 
         public void TestIslemleri()
         {
-            var scraping = new SeleniumScraping(Url);
+            var scraping = new SeleniumChromeScraping();
+            scraping.GoToUrl(Url,true); 
+           
+
             try
             {
                 var mainElementXpath = "//*[@id=\"searchResultsTable\"]/tbody";
@@ -84,7 +89,7 @@ namespace DS.ConsoleUI.TestCompanies
             }
             finally
             {
-                scraping.StopWrobser();
+                scraping.CloseBrowser();
             }
 
         }

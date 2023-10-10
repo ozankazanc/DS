@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DS.ScrabingOperations.Scraping
 {
-    public interface IScraping
+    internal interface ISeleniumScraping
     {
         //xpath
         IWebElement GetElementByXPath(string xPath);
@@ -27,12 +27,12 @@ namespace DS.ScrabingOperations.Scraping
 
     }
 
-    public class Scraping<T> : IScraping where T : IWebDriver, new()
+    public class SeleniumScraping : ISeleniumScraping
     {
-        protected IWebDriver _driver;
-        public Scraping()
+        private readonly IWebDriver _driver;
+        public SeleniumScraping(IWebDriver driver)
         {
-            _driver = new T();
+            _driver = driver;
         }
         public IWebElement GetElementByXPath(string xPath)
         {

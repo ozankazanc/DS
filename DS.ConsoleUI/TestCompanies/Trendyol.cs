@@ -1,24 +1,27 @@
 ﻿using DS.ScrabingOperations.Scraping;
 using DS.ScrabingOperations.Scraping.Selenium;
+using DS.ScrabingOperations.Scraping.Selenium.BrowserScraping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
+
 
 namespace DS.ConsoleUI.TestCompanies
 {
     public class Trendyol
     {
-        public string Url ="https://www.sahibinden.com/kiralik/bursa?query_text_mf=bursa+kiralik+ev&query_text=kiralik+ev";
+        public string Url = "https://www.trendyol.com/sr?q=xbox&qt=xbox&st=xbox&os=1";
 
         public void TestIslemleri()
         {
-            var scraping = new SeleniumScraping(Url);
+            var scraping = new SeleniumChromeScraping();
+            scraping.GoToUrl(Url);
+           
             try
             {
-                var mainXpath = "/html/body/div[1]/div[3]/div[2]/div[2]/div/div/div/div[1]/div[2]/div[3]/div[1]/div";
+                var mainXpath = "/html/body/div[1]/div[3]/div[2]/div[2]/div/div/div/div[1]/div[2]/div[4]/div[1]/div";
                 var repetitiveClassName = "p-card-wrppr";
                 var columnNames = new string[3] { "Marka", "Açıklama", "Fiyat" };
                 var columnValuesClassNames = new string[3] { "prc-box-dscntd", "prdct-desc-cntnr-ttl", "prdct-desc-cntnr-name" };
@@ -32,7 +35,7 @@ namespace DS.ConsoleUI.TestCompanies
             }
             finally
             {
-                scraping.StopWrobser();
+                scraping.CloseBrowser();
             }
 
         }

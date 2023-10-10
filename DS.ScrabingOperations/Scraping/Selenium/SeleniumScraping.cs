@@ -14,7 +14,7 @@ using System.Xml.Linq;
 
 namespace DS.ScrabingOperations.Scraping.Selenium
 {
-    public class SeleniumScraping
+    public class SeleniumScrapings
     {
 
         private IWebDriver _driver;
@@ -73,26 +73,7 @@ namespace DS.ScrabingOperations.Scraping.Selenium
 
         }
 
-        public void ScrollDown()
-        {
-            long scrollHeight = 0;
-
-            do
-            {
-                IJavaScriptExecutor js = (IJavaScriptExecutor)_driver;
-                var newScrollHeight = (long)js.ExecuteScript("window.scrollTo(0, document.body.scrollHeight); return document.body.scrollHeight;");
-
-                if (newScrollHeight == scrollHeight)
-                {
-                    break;
-                }
-                else
-                {
-                    scrollHeight = newScrollHeight;
-                    Thread.Sleep(400);
-                }
-            } while (true);
-        }
+      
 
         public void StopWrobser()
         {

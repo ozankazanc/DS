@@ -9,15 +9,10 @@ using System.Threading.Tasks;
 
 namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
 {
-    public abstract class ABrowser<TWebDriver, TDriverService, TOptions> : IScraping
+    internal abstract class ABrowser<TWebDriver, TDriverService, TOptions>
         where TWebDriver : WebDriver
     {
-        public ABrowser()
-        {
-            
-            
-        }
-        protected virtual TWebDriver Driver => SetWebDriver();
+        private TWebDriver Driver { get; set; }
         protected abstract TWebDriver SetWebDriver();
         protected abstract TDriverService SetDriverSevice();
         protected abstract TOptions SetOptions();
@@ -25,85 +20,39 @@ namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
         {
             Thread.Sleep(milisecond);
         }
+        public virtual TWebDriver SetCustomWebDriver()
+        {
+            throw new NotImplementedException();
+        }
 
-        protected IWebDriver GetDriver()
+        public IWebDriver GetDriver()
         {
             return Driver;
         }
-        protected IWebDriver GetDriver(string url)
+        public IWebDriver GetDriver(string url)
         {
-            Driver.Navigate().GoToUrl(url);
+            return GetDriver(url, 1000);
+        }
+        public IWebDriver GetDriver(string url, int waitMiliSecond)
+        {
+            return GetDriver(url, waitMiliSecond, false);
+        }
+        public IWebDriver GetDriver(string url, int waitMiliSecond, bool useLocalBrowser)
+        {
+            if (useLocalBrowser)
+                Driver = SetCustomWebDriver();
+            else
+                Driver = SetWebDriver();
+            
+            Driver.Url = url;
+            WaitWhileReachingUrl(waitMiliSecond);
             return Driver;
         }
-        protected IWebDriver GetDriver(string url, int waitSecond)
-        {
-            Driver.Navigate().GoToUrl(url);
-            return Driver;
-        }
-       
+
         public void CloseDriver()
         {
-            _driver.Close();
+            Driver.Quit();
         }
 
-        public IWebElement GetElementByXPath(string xPath)
-        {
-            return Driver.FindElement(By.XPath(xPath));
-        }
-
-        public IList<IWebElement> GetElementsByXPath(string xPath)
-        {
-            return Driver.FindElements(By.XPath(xPath));
-        }
-
-        public IWebElement GetElementByXPath(string xPath, IWebElement webElement)
-        {
-            return Driver.FindElement(By.XPath(xPath));
-        }
-
-        public IList<IWebElement> GetElementsByXPath(string xPath, IWebElement webElement)
-        {
-            return webElement.FindElements(By.XPath(xPath));
-        }
-
-        public IWebElement GetElementByTagName(string tagName)
-        {
-            return Driver.FindElement(By.TagName(tagName));
-        }
-
-        public IList<IWebElement> GetElementsByTagName(string tagName)
-        {
-            return Driver.FindElements(By.TagName(tagName));
-        }
-
-        public IWebElement GetElementByTagName(string tagName, IWebElement webElement)
-        {
-            return webElement.FindElement(By.TagName(tagName));
-        }
-
-        public IList<IWebElement> GetElementsByTagName(string tagName, IWebElement webElement)
-        {
-            return webElement.FindElements(By.TagName(tagName));
-        }
-
-        public IWebElement GetElementByClassName(string className)
-        {
-            return Driver.FindElement(By.ClassName(className));
-        }
-
-        public IList<IWebElement> GetElementsByClassName(string className)
-        {
-            return Driver.FindElements(By.ClassName(className));
-        }
-
-        public IWebElement GetElementByClassName(string className, IWebElement webElement)
-        {
-            return webElement.FindElement(By.ClassName(className));
-        }
-
-        public IList<IWebElement> GetElementsByClassName(string className, IWebElement webElement)
-        {
-            return webElement.FindElements(By.ClassName(className));
-        }
     }
 }
