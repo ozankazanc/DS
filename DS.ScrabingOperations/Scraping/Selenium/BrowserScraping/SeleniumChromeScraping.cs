@@ -29,6 +29,10 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
         public void GoToUrl(string url, bool useLocalBrowser)
         {
             _seleniumBrowserScraping = new SeleniumBrowserScraping(_browser.GetDriver(url, 1000, useLocalBrowser));
+        }
+
+        public void ClickNextPage()
+        {
            
         }
 
@@ -36,11 +40,6 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
         {
             return _seleniumBrowserScraping.GetData(dataInformation);
         }
-        public DataTable GetData(string mainElementXPath, string subElementsClassName, Dictionary<string, string> columnsWithClassNames)
-        {
-            return _seleniumBrowserScraping.GetData(mainElementXPath, subElementsClassName, columnsWithClassNames);
-        }
-
         public void CloseBrowser()
         {
             _browser.CloseDriver();

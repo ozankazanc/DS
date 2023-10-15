@@ -2,6 +2,7 @@
 using DS.ScrabingOperations.Scraping.Selenium;
 using DS.ScrabingOperations.Scraping.Selenium.Browsers;
 using DS.ScrabingOperations.Scraping.Selenium.BrowserScraping;
+using DS.ScrabingOperations.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace DS.ConsoleUI.TestCompanies
             {
                 var mainElementXpath = "//*[@id=\"searchResultsTable\"]/tbody";
                 var subElementsClassName = "searchResultsItem";
+                var nextPageUrl = "//*[@id=\"searchResultsSearchForm\"]/div[1]/div[3]/div[3]/div[1]/ul/li[15]/a";
 
                 #region test
                 //var columnInformations = new Dictionary<string, string>();
@@ -44,6 +46,8 @@ namespace DS.ConsoleUI.TestCompanies
                 {
                     MainElement = new ElementInformation { SearchType = SearchType.xPath, SearchValue = mainElementXpath },
                     SubElements = new ElementInformation { SearchType = SearchType.ClassName, SearchValue = subElementsClassName },
+                    //NextPageUrl = new ElementInformation { SearchType = SearchType.TagName, SearchValue = subElementsClassName },
+                    //PreviousPageUrl = new ElementInformation { SearchType = SearchType.ClassName, SearchValue = subElementsClassName },
                     ColumnInformations = new List<ColumnInformation>
                     {
                         new ColumnInformation
@@ -56,31 +60,31 @@ namespace DS.ConsoleUI.TestCompanies
                         {
                             ColumnName = "m2",
                             SearchType = SearchType.xPath,
-                            SearchValue = "//*[@id=\"searchResultsTable\"]/tbody/tr[#x#]/td[4]"
+                            SearchValue = $"//*[@id=\"searchResultsTable\"]/tbody/tr[{Constants.ROWNUMBERINCREASEKEY}]/td[3]"
                         },
                         new ColumnInformation
                         {
                             ColumnName = "Oda Sayısı",
                             SearchType = SearchType.xPath,
-                            SearchValue = "//*[@id=\"searchResultsTable\"]/tbody/tr[#x#]/td[5]"
+                            SearchValue = $"//*[@id=\"searchResultsTable\"]/tbody/tr[{Constants.ROWNUMBERINCREASEKEY}]/td[4]"
                         },
                          new ColumnInformation
                         {
                             ColumnName = "Fiyat",
                             SearchType = SearchType.xPath,
-                            SearchValue = "//*[@id=\"searchResultsTable\"]/tbody/tr[[#x#]/td[6]/div/span"
+                            SearchValue = $"//*[@id=\"searchResultsTable\"]/tbody/tr[{Constants.ROWNUMBERINCREASEKEY}]/td[5]/div/span"
                         },
                           new ColumnInformation
                         {
                             ColumnName = "İlan Tarihi",
                             SearchType = SearchType.xPath,
-                            SearchValue = "//*[@id=\"searchResultsTable\"]/tbody/tr[#x#]/td[7]/span[1]"
+                            SearchValue = $"//*[@id=\"searchResultsTable\"]/tbody/tr[{Constants.ROWNUMBERINCREASEKEY}]/td[6]/span[1]"
                         },
                             new ColumnInformation
                         {
                             ColumnName = "İlçe Semt",
                             SearchType = SearchType.xPath,
-                            SearchValue = "//*[@id=\"searchResultsTable\"]/tbody/tr[#x#]/td[8]"
+                            SearchValue = $"//*[@id=\"searchResultsTable\"]/tbody/tr[{Constants.ROWNUMBERINCREASEKEY}]/td[7]"
                         }
                     }
                 };

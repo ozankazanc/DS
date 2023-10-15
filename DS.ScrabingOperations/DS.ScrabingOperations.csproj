@@ -74,6 +74,7 @@
     <Compile Include="Scraping\Selenium\Browsers\ChromeBrowser.cs" />
     <Compile Include="Scraping\Selenium\Browsers\EdgeBrowser.cs" />
     <Compile Include="Scraping\Selenium\Browsers\FirefoxBrowser.cs" />
+    <Compile Include="Utils\Constants.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ExternalFiles\Chrome\chromePort9222.bat">

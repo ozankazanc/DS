@@ -11,7 +11,10 @@ namespace DS.ScrabingOperations.Models
     {
         public ElementInformation MainElement { get; set; }
         public ElementInformation SubElements { get; set; }
+        public PageUrl NextPageUrl { get; set; }
+        public PageUrl PreviousPageUrl { get; set; }
         public List<ColumnInformation> ColumnInformations { get; set; }
+
     }
 
     public class ElementInformation : SearchOption
@@ -21,6 +24,10 @@ namespace DS.ScrabingOperations.Models
     public class ColumnInformation : SearchOption
     {
         public string ColumnName { get; set; }
+    }
+    public class PageUrl : SearchOption
+    {
+        public string URL { get; set; }
     }
 
     public class SearchOption

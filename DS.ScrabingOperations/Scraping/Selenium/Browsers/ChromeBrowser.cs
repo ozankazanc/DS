@@ -52,10 +52,12 @@ namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
             processInfo.UseShellExecute = false;
             Process.Start(processInfo);
 
-            Environment.SetEnvironmentVariable("webdriver.chrome.driver", "E:\\chromedata\\chromedriver.exe");
+            Environment.SetEnvironmentVariable("webdriver.chrome.driver", "E:\\chromedataa\\chromedriver.exe");
            
-            return new ChromeDriver(SetOptions());
+            return new ChromeDriver(options);
         }
+
+        
     }
 
 

@@ -12,7 +12,7 @@ namespace DS.ConsoleUI.TestCompanies
 {
     public class Trendyol
     {
-        public string Url = "https://www.trendyol.com/sr?q=xbox&qt=xbox&st=xbox&os=1";
+        public string Url = "https://www.trendyol.com/sr?q=nevresim&qt=nevresim&st=nevresim&os=1&sst=PRICE_BY_DESC";
 
         public void TestIslemleri()
         {
@@ -23,7 +23,7 @@ namespace DS.ConsoleUI.TestCompanies
             {
                 var mainXpath = "/html/body/div[1]/div[3]/div[2]/div[2]/div/div/div/div[1]/div[2]/div[4]/div[1]/div";
                 var repetitiveClassName = "p-card-wrppr";
-                var columnNames = new string[3] { "Marka", "Açıklama", "Fiyat" };
+                var columnNames = new string[3] { "Açıklama", "Marka", "Fiyat" };
                 var columnValuesClassNames = new string[3] { "prc-box-dscntd", "prdct-desc-cntnr-ttl", "prdct-desc-cntnr-name" };
 
                 var columnInformations = new Dictionary<string, string>();
@@ -31,7 +31,7 @@ namespace DS.ConsoleUI.TestCompanies
                 columnInformations.Add("Açıklama", "prdct-desc-cntnr-ttl");
                 columnInformations.Add("Fiyat", "prc-box-dscntd");
 
-                var data = scraping.GetData(mainXpath, repetitiveClassName, columnInformations);
+               // var data = scraping.GetData(mainXpath, repetitiveClassName, columnInformations);
             }
             finally
             {

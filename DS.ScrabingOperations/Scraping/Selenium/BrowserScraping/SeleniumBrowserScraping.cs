@@ -1,5 +1,6 @@
 ﻿using DS.ScrabingOperations.Models;
 using DS.ScrabingOperations.Scraping.Selenium.Browsers;
+using DS.ScrabingOperations.Utils;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
 {
@@ -28,76 +30,39 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
                 dataTable.Columns.Add(columnInformation.ColumnName, typeof(string));
             }
 
-            var mainElement = ElementOperationBySearchType(dataInformation);
-            var subElements = SubElementsOperationBySearchType(dataInformation, mainElement);
+            var mainElement = GetElementBySearchOption(dataInformation.MainElement);
+            var subElements = GetElementsBySearchOption(dataInformation.SubElements, mainElement);
 
+            var numerator = 0;
             foreach (var element in subElements)
             {
                 var rowValues = new List<string>();
-                var numerator = 0;
+                numerator++;
                 foreach (var columnInformation in dataInformation.ColumnInformations)
                 {
-                    var value = string.Empty;
-                    switch (columnInformation.SearchType)
-                    {
-                        case SearchType.xPath:
-                            value = element.FindElement(By.XPath(XPathNumerator(ref numerator, columnInformation.SearchValue))).Text;
-                            break;
-                        case SearchType.TagName:
-                            value = element.FindElement(By.TagName(columnInformation.SearchValue)).Text;
-                            break;
-                        case SearchType.ClassName:
-                            value = element.FindElement(By.ClassName(columnInformation.SearchValue)).Text;
-                            break;
-                        default:
-                            throw new NotImplementedException();
-                    }
+                    var value = FindElementText(element, columnInformation, numerator);
                     rowValues.Add(value);
                 }
-                dataTable.Rows.Add(rowValues);
-            }
-
-            return dataTable;
-        }
-
-        public DataTable GetData(string mainElementXPath, string subElementsClassName, Dictionary<string, string> columnsWithClassNames)
-        {
-            var dataTable = new DataTable();
-
-            foreach (var columnName in columnsWithClassNames.Keys)
-            {
-                dataTable.Columns.Add(columnName, typeof(string));
-            }
-
-            var mainElement = GetElementByXPath(mainElementXPath);
-            var elements = GetElementsByClassName(subElementsClassName, mainElement);
-
-            foreach (var element in elements)
-            {
-                var rowValues = new List<string>();
-                foreach (var value in columnsWithClassNames.Values)
-                    rowValues.Add(element.FindElement(By.ClassName(value)).Text);
-
                 dataTable.Rows.Add(rowValues.ToArray());
             }
 
             return dataTable;
         }
 
-        public IWebElement ElementOperationBySearchType(DataInformation dataInformation)
+        public IWebElement GetElementBySearchOption(SearchOption elementInformation)
         {
             IWebElement mainElement;
 
-            switch (dataInformation.MainElement.SearchType)
+            switch (elementInformation.SearchType)
             {
                 case SearchType.xPath:
-                    mainElement = GetElementByXPath(dataInformation.MainElement.SearchValue);
+                    mainElement = GetElementByXPath(elementInformation.SearchValue);
                     break;
                 case SearchType.TagName:
-                    mainElement = GetElementByTagName(dataInformation.MainElement.SearchValue);
+                    mainElement = GetElementByTagName(elementInformation.SearchValue);
                     break;
                 case SearchType.ClassName:
-                    mainElement = GetElementByClassName(dataInformation.MainElement.SearchValue);
+                    mainElement = GetElementByClassName(elementInformation.SearchValue);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -105,20 +70,20 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
             return mainElement;
         }
 
-        public IList<IWebElement> SubElementsOperationBySearchType(DataInformation dataInformation, IWebElement mainElement)
+        public IList<IWebElement> GetElementsBySearchOption(SearchOption searchOption, IWebElement mainElement)
         {
             IList<IWebElement> subElement;
 
-            switch (dataInformation.SubElements.SearchType)
+            switch (searchOption.SearchType)
             {
                 case SearchType.xPath:
-                    subElement = GetElementsByXPath(dataInformation.SubElements.SearchValue, mainElement);
+                    subElement = GetElementsByXPath(searchOption.SearchValue, mainElement);
                     break;
                 case SearchType.TagName:
-                    subElement = GetElementsByTagName(dataInformation.SubElements.SearchValue, mainElement);
+                    subElement = GetElementsByTagName(searchOption.SearchValue, mainElement);
                     break;
                 case SearchType.ClassName:
-                    subElement = GetElementsByClassName(dataInformation.SubElements.SearchValue, mainElement);
+                    subElement = GetElementsByClassName(searchOption.SearchValue, mainElement);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -126,10 +91,9 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
             return subElement;
         }
 
-        public string XPathNumerator(ref int num, string xPath)
+        public string XPathNumerator(int num, string xPath)
         {
-            num++;
-            var addedNumXpath = xPath.Replace("#x#", num.ToString());
+            var addedNumXpath = xPath.Replace(Constants.ROWNUMBERINCREASEKEY, num.ToString());
             return addedNumXpath;
         }
 
@@ -158,6 +122,44 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
                 return null;
             else
                 return GetListOfElementsTextByPath(xPaths.ToArray());
+        }
+
+        public string FindElementText(IWebElement element, SearchOption searchOption, int numerator = 0)
+        {
+            string value = string.Empty;
+            try
+            {
+                switch (searchOption.SearchType)
+                {
+                    case SearchType.xPath:
+                        value = element.FindElement(By.XPath(XPathNumerator(numerator, searchOption.SearchValue))).Text;
+                        break;
+                    case SearchType.TagName:
+                        value = element.FindElement(By.TagName(searchOption.SearchValue)).Text;
+                        break;
+                    case SearchType.ClassName:
+                        value = element.FindElement(By.ClassName(searchOption.SearchValue)).Text;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return value;
+        }
+
+        public string GetNextPageUrl(PageUrl url)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetPrevPageUrl(PageUrl url)
+        {
+            throw new NotImplementedException();
         }
 
 
@@ -221,6 +223,9 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
         {
             return webElement.FindElements(By.ClassName(className));
         }
+
+
+
         #endregion
 
     }

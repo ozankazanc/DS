@@ -46,6 +46,7 @@ namespace DS.ScrabingOperations.Scraping.Selenium.Browsers
             
             Driver.Url = url;
             WaitWhileReachingUrl(waitMiliSecond);
+           
             return Driver;
         }
 
