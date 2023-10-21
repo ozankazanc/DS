@@ -14,6 +14,7 @@ namespace DS.ScrabingOperations.Models
         public PageUrl NextPageUrl { get; set; }
         public PageUrl PreviousPageUrl { get; set; }
         public List<ColumnInformation> ColumnInformations { get; set; }
+        public int? MaxRow { get; set; }
 
     }
 

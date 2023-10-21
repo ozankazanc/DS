@@ -14,6 +14,7 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
 {
     internal class SeleniumBrowserScraping : ISeleniumBrowserScraping
     {
+        private DataTable dataTable = null;
         private readonly IWebDriver _driver;
         public SeleniumBrowserScraping(IWebDriver driver)
         {
@@ -23,11 +24,11 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
 
         public DataTable GetData(DataInformation dataInformation)
         {
-            var dataTable = new DataTable();
-
-            foreach (var columnInformation in dataInformation.ColumnInformations)
+            if (dataTable == null)
             {
-                dataTable.Columns.Add(columnInformation.ColumnName, typeof(string));
+                dataTable = new DataTable();
+                foreach (var columnInformation in dataInformation.ColumnInformations)
+                    dataTable.Columns.Add(columnInformation.ColumnName, typeof(string));
             }
 
             var mainElement = GetElementBySearchOption(dataInformation.MainElement);
@@ -41,9 +42,22 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
                 foreach (var columnInformation in dataInformation.ColumnInformations)
                 {
                     var value = FindElementText(element, columnInformation, numerator);
-                    rowValues.Add(value);
+
+                    if (!string.IsNullOrEmpty(value))
+                        rowValues.Add(value);
                 }
-                dataTable.Rows.Add(rowValues.ToArray());
+
+                //kayıt arasina alakasiz bir row girerse ekleme
+                if (rowValues.Count == dataTable.Columns.Count)
+                    dataTable.Rows.Add(rowValues.ToArray());
+
+            }
+
+            if (dataInformation.NextPageUrl != null && (dataInformation.MaxRow.HasValue && dataInformation.MaxRow.Value > dataTable.Rows.Count))
+            {
+                SetNextPageUrl(dataInformation.NextPageUrl);
+                _driver.Navigate().GoToUrl(dataInformation.NextPageUrl.URL);
+                GetData(dataInformation);
             }
 
             return dataTable;
@@ -97,33 +111,6 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
             return addedNumXpath;
         }
 
-        public string GetOneElementTextByXPath(string xPath)
-        {
-            var element = GetElementByXPath(xPath);
-            return element.Text;
-        }
-
-        public List<string> GetListOfElementsTextByPath(params string[] xPath)
-        {
-            if (xPath.Length == 0)
-                return null;
-
-            var elements = new List<string>();
-
-            foreach (var xp in xPath)
-                elements.Add(GetOneElementTextByXPath(xp));
-
-            return elements;
-        }
-
-        public List<string> GetListOfElementsTextByPath(List<string> xPaths)
-        {
-            if (xPaths.Count == 0)
-                return null;
-            else
-                return GetListOfElementsTextByPath(xPaths.ToArray());
-        }
-
         public string FindElementText(IWebElement element, SearchOption searchOption, int numerator = 0)
         {
             string value = string.Empty;
@@ -152,14 +139,16 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
             return value;
         }
 
-        public string GetNextPageUrl(PageUrl url)
+        public void SetNextPageUrl(PageUrl url)
         {
-            throw new NotImplementedException();
+            var element = GetElementBySearchOption(url);
+            url.URL = element.GetAttribute("href");
         }
 
-        public string GetPrevPageUrl(PageUrl url)
+        public void SetPrevPageUrl(PageUrl url)
         {
-            throw new NotImplementedException();
+            var element = GetElementBySearchOption(url);
+            url.URL = FindElementText(element, url);
         }
 
 

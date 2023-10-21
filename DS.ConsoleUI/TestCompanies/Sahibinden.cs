@@ -18,15 +18,20 @@ namespace DS.ConsoleUI.TestCompanies
         public void TestIslemleri()
         {
             var scraping = new SeleniumChromeScraping();
-            scraping.GoToUrl(Url,true); 
-           
+            scraping.GoToUrl(Url, true);
+
 
             try
             {
                 var mainElementXpath = "//*[@id=\"searchResultsTable\"]/tbody";
                 var subElementsClassName = "searchResultsItem";
                 var nextPageUrl = "//*[@id=\"searchResultsSearchForm\"]/div[1]/div[3]/div[3]/div[1]/ul/li[15]/a";
-
+                //*[@id="searchResultsSearchForm"]/div[1]/div[3]/div[3]/div[1]/ul/li[16]/a
+                //*[@id="search"]/div[1]/div[1]/div/span[1]/div[1]/div[25]/div/div/span/a[4]
+                //*[@id="search"]/div[1]/div[1]/div/span[1]/div[1]/div[25]/div/div/span/a[5]
+                //*[@id="search"]/div[1]/div[1]/div/span[1]/div[1]/div[25]/div/div/span/a[5]
+               
+                //*[@id="searchResultsTable"]/tbody/tr[1]/td[2]/a[1]
                 #region test
                 //var columnInformations = new Dictionary<string, string>();
                 //columnInformations.Add("İlan Başlığı", "classifiedTitle");
@@ -46,8 +51,8 @@ namespace DS.ConsoleUI.TestCompanies
                 {
                     MainElement = new ElementInformation { SearchType = SearchType.xPath, SearchValue = mainElementXpath },
                     SubElements = new ElementInformation { SearchType = SearchType.ClassName, SearchValue = subElementsClassName },
-                    //NextPageUrl = new ElementInformation { SearchType = SearchType.TagName, SearchValue = subElementsClassName },
-                    //PreviousPageUrl = new ElementInformation { SearchType = SearchType.ClassName, SearchValue = subElementsClassName },
+                    NextPageUrl = new PageUrl { SearchType = SearchType.xPath, SearchValue = nextPageUrl },
+                    MaxRow = 100,
                     ColumnInformations = new List<ColumnInformation>
                     {
                         new ColumnInformation
@@ -87,6 +92,7 @@ namespace DS.ConsoleUI.TestCompanies
                             SearchValue = $"//*[@id=\"searchResultsTable\"]/tbody/tr[{Constants.ROWNUMBERINCREASEKEY}]/td[7]"
                         }
                     }
+
                 };
 
                 var data = scraping.GetData(dataInformation);
