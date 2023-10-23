@@ -1,8 +1,7 @@
-﻿using DS.ScrabingOperations.Models;
-using DS.ScrabingOperations.Scraping.Selenium;
-using DS.ScrabingOperations.Scraping.Selenium.Browsers;
-using DS.ScrabingOperations.Scraping.Selenium.BrowserScraping;
-using DS.ScrabingOperations.Utils;
+﻿using DS.Scraping.Models;
+using DS.Scraping.Scraping.Selenium;
+using DS.Scraping.Scraping.Selenium.ScrapingOperations;
+using DS.Scraping.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +16,10 @@ namespace DS.ConsoleUI.TestCompanies
 
         public void TestIslemleri()
         {
-            var scraping = new SeleniumChromeScraping();
-            scraping.GoToUrl(Url, true);
+            var scraping = new ChromeOperations();
+            
+            //var scraping = new SeleniumChromeScraping();
+            //scraping.GoToUrl(Url, true);
 
 
             try
@@ -26,13 +27,16 @@ namespace DS.ConsoleUI.TestCompanies
                 var mainElementXpath = "//*[@id=\"searchResultsTable\"]/tbody";
                 var subElementsClassName = "searchResultsItem";
                 var nextPageUrl = "//*[@id=\"searchResultsSearchForm\"]/div[1]/div[3]/div[3]/div[1]/ul/li[15]/a";
+
+                #region test
+
                 //*[@id="searchResultsSearchForm"]/div[1]/div[3]/div[3]/div[1]/ul/li[16]/a
                 //*[@id="search"]/div[1]/div[1]/div/span[1]/div[1]/div[25]/div/div/span/a[4]
                 //*[@id="search"]/div[1]/div[1]/div/span[1]/div[1]/div[25]/div/div/span/a[5]
                 //*[@id="search"]/div[1]/div[1]/div/span[1]/div[1]/div[25]/div/div/span/a[5]
-               
+
                 //*[@id="searchResultsTable"]/tbody/tr[1]/td[2]/a[1]
-                #region test
+
                 //var columnInformations = new Dictionary<string, string>();
                 //columnInformations.Add("İlan Başlığı", "classifiedTitle");
                 //columnInformations.Add("m2 Brüt", "prdct-desc-cntnr-ttl");
@@ -51,7 +55,7 @@ namespace DS.ConsoleUI.TestCompanies
                 {
                     MainElement = new ElementInformation { SearchType = SearchType.xPath, SearchValue = mainElementXpath },
                     SubElements = new ElementInformation { SearchType = SearchType.ClassName, SearchValue = subElementsClassName },
-                    NextPageUrl = new PageUrl { SearchType = SearchType.xPath, SearchValue = nextPageUrl },
+                    NextPageUrl = new PageUrl { SearchType = SearchType.ClassName, SearchValue = "pageNaviButtons" },
                     MaxRow = 100,
                     ColumnInformations = new List<ColumnInformation>
                     {
@@ -95,11 +99,11 @@ namespace DS.ConsoleUI.TestCompanies
 
                 };
 
-                var data = scraping.GetData(dataInformation);
+                scraping.Run(dataInformation,Url);
             }
             finally
             {
-                scraping.CloseBrowser();
+                //scraping.CloseBrowser();
             }
 
         }

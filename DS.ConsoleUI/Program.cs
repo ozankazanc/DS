@@ -1,6 +1,5 @@
 ﻿using DS.ConsoleUI.TestCompanies;
-using DS.ScrabingOperations.Scraping.Selenium;
-using DS.ScrabingOperations.Scraping.Selenium.Browsers;
+using DS.Scraping.Scraping.Selenium;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;

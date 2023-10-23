@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.ScrabingOperations.Utils
+namespace DS.Scraping.Utils
 {
     public static class Constants
     {

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeVPN", "FreeVPN\FreeVPN.csproj", "{89131EC1-1524-43EE-B282-57A5B745F3E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.ScrabingOperations", "DS.ScrabingOperations\DS.ScrabingOperations.csproj", "{FA77FF6E-C77A-4D57-B950-9F1D6A055465}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.Scraping", "DS.ScrabingOperations\DS.Scraping.csproj", "{FA77FF6E-C77A-4D57-B950-9F1D6A055465}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.ConsoleUI", "DS.ConsoleUI\DS.ConsoleUI.csproj", "{57B8E912-C1E3-422F-8A1B-9BA58DEFB344}"
 EndProject

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.ScrabingOperations.Scraping
+namespace DS.Scraping.Scraping.Selenium.Browser
 {
-    internal interface ISeleniumScraping
+    internal interface IBrowserScraping
     {
         //xpath
         IWebElement GetElementByXPath(string xPath);
@@ -27,7 +27,7 @@ namespace DS.ScrabingOperations.Scraping
 
     }
 
-    public class SeleniumScraping : ISeleniumScraping
+    public class SeleniumScraping : IBrowserScraping
     {
         private readonly IWebDriver _driver;
         public SeleniumScraping(IWebDriver driver)

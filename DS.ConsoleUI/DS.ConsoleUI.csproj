@@ -74,9 +74,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DS.ScrabingOperations\DS.ScrabingOperations.csproj">
+    <ProjectReference Include="..\DS.ScrabingOperations\DS.Scraping.csproj">
       <Project>{fa77ff6e-c77a-4d57-b950-9f1d6a055465}</Project>
-      <Name>DS.ScrabingOperations</Name>
+      <Name>DS.Scraping</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

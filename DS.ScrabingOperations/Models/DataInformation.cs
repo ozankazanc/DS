@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.ScrabingOperations.Models
+namespace DS.Scraping.Models
 {
 
     public class DataInformation
@@ -41,6 +41,7 @@ namespace DS.ScrabingOperations.Models
     {
         xPath = 1,
         TagName = 2,
-        ClassName = 3
+        ClassName = 3,
+        AttributeName = 4
     }
 }

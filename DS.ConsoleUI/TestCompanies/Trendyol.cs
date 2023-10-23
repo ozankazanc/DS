@@ -1,6 +1,7 @@
-﻿using DS.ScrabingOperations.Scraping;
-using DS.ScrabingOperations.Scraping.Selenium;
-using DS.ScrabingOperations.Scraping.Selenium.BrowserScraping;
+﻿using DS.ScrabingOperations.Scraping.Selenium.ScrapingOperations;
+using DS.Scraping.Scraping;
+using DS.Scraping.Scraping.Selenium;
+using DS.Scraping.Scraping.Selenium.ScrapingOperations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,9 @@ namespace DS.ConsoleUI.TestCompanies
 
         public void TestIslemleri()
         {
-            var scraping = new SeleniumChromeScraping();
-            scraping.GoToUrl(Url);
-           
-            try
+            var scraping = new ChromeOperations();
+            
+           try
             {
                 var mainXpath = "/html/body/div[1]/div[3]/div[2]/div[2]/div/div/div/div[1]/div[2]/div[4]/div[1]/div";
                 var repetitiveClassName = "p-card-wrppr";
@@ -35,7 +35,7 @@ namespace DS.ConsoleUI.TestCompanies
             }
             finally
             {
-                scraping.CloseBrowser();
+                //scraping.CloseBrowser();
             }
 
         }

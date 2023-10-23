@@ -1,29 +1,31 @@
-﻿using DS.ScrabingOperations.Models;
-using DS.ScrabingOperations.Scraping.Selenium.Browsers;
-using DS.ScrabingOperations.Utils;
+﻿using DS.Scraping.Models;
+using DS.Scraping.Scraping;
+using DS.Scraping.Scraping.Selenium.Browser;
+using DS.Scraping.Utils;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
-namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
+namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
 {
-    internal class SeleniumBrowserScraping : ISeleniumBrowserScraping
+    public class CommonScrapingOperations : ICommonScrapingOperations
     {
-        private DataTable dataTable = null;
-        private readonly IWebDriver _driver;
-        public SeleniumBrowserScraping(IWebDriver driver)
+        private ABrowser _browser;
+        private DataTable dataTable;
+        public CommonScrapingOperations(ABrowser testABrowser)
         {
-            _driver = driver;
-
+            _browser = testABrowser;
         }
 
-        public DataTable GetData(DataInformation dataInformation)
+        public DataTable GetData(DataInformation dataInformation, string url)
         {
+            _browser.GoToUrl(url);
+
             if (dataTable == null)
             {
                 dataTable = new DataTable();
@@ -56,13 +58,13 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
             if (dataInformation.NextPageUrl != null && (dataInformation.MaxRow.HasValue && dataInformation.MaxRow.Value > dataTable.Rows.Count))
             {
                 SetNextPageUrl(dataInformation.NextPageUrl);
-                _driver.Navigate().GoToUrl(dataInformation.NextPageUrl.URL);
-                GetData(dataInformation);
+                GetData(dataInformation, dataInformation.NextPageUrl.URL);
             }
+
+            _browser.CloseBrowser();
 
             return dataTable;
         }
-
         public IWebElement GetElementBySearchOption(SearchOption elementInformation)
         {
             IWebElement mainElement;
@@ -70,20 +72,19 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
             switch (elementInformation.SearchType)
             {
                 case SearchType.xPath:
-                    mainElement = GetElementByXPath(elementInformation.SearchValue);
+                    mainElement = _browser.GetElementByXPath(elementInformation.SearchValue);
                     break;
                 case SearchType.TagName:
-                    mainElement = GetElementByTagName(elementInformation.SearchValue);
+                    mainElement = _browser.GetElementByTagName(elementInformation.SearchValue);
                     break;
                 case SearchType.ClassName:
-                    mainElement = GetElementByClassName(elementInformation.SearchValue);
+                    mainElement = _browser.GetElementByClassName(elementInformation.SearchValue);
                     break;
                 default:
                     throw new NotImplementedException();
             }
             return mainElement;
         }
-
         public IList<IWebElement> GetElementsBySearchOption(SearchOption searchOption, IWebElement mainElement)
         {
             IList<IWebElement> subElement;
@@ -91,26 +92,24 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
             switch (searchOption.SearchType)
             {
                 case SearchType.xPath:
-                    subElement = GetElementsByXPath(searchOption.SearchValue, mainElement);
+                    subElement = _browser.GetElementsByXPath(searchOption.SearchValue, mainElement);
                     break;
                 case SearchType.TagName:
-                    subElement = GetElementsByTagName(searchOption.SearchValue, mainElement);
+                    subElement = _browser.GetElementsByTagName(searchOption.SearchValue, mainElement);
                     break;
                 case SearchType.ClassName:
-                    subElement = GetElementsByClassName(searchOption.SearchValue, mainElement);
+                    subElement = _browser.GetElementsByClassName(searchOption.SearchValue, mainElement);
                     break;
                 default:
                     throw new NotImplementedException();
             }
             return subElement;
         }
-
         public string XPathNumerator(int num, string xPath)
         {
             var addedNumXpath = xPath.Replace(Constants.ROWNUMBERINCREASEKEY, num.ToString());
             return addedNumXpath;
         }
-
         public string FindElementText(IWebElement element, SearchOption searchOption, int numerator = 0)
         {
             string value = string.Empty;
@@ -138,84 +137,42 @@ namespace DS.ScrabingOperations.Scraping.Selenium.BrowserScraping
 
             return value;
         }
-
         public void SetNextPageUrl(PageUrl url)
         {
-            var element = GetElementBySearchOption(url);
-            url.URL = element.GetAttribute("href");
+            var mainElement = GetElementBySearchOption(url);
+            var subElements = GetElementsBySearchOption(
+                new SearchOption
+                {
+                    SearchType = SearchType.TagName,
+                    SearchValue = HtmlTags.a
+                },
+                mainElement);
+            var nextUrl = subElements.Last().GetAttribute("href");
+            url.URL = nextUrl;
         }
-
         public void SetPrevPageUrl(PageUrl url)
         {
-            var element = GetElementBySearchOption(url);
-            url.URL = FindElementText(element, url);
+            throw new NotImplementedException();
         }
-
-
-        #region GetElementSide
-        public IWebElement GetElementByXPath(string xPath)
+        public void ScrollDown()
         {
-            return _driver.FindElement(By.XPath(xPath));
+            long scrollHeight = 0;
+
+            do
+            {
+                IJavaScriptExecutor js = (IJavaScriptExecutor)_browser;
+                var newScrollHeight = (long)js.ExecuteScript("window.scrollTo(0, document.body.scrollHeight); return document.body.scrollHeight;");
+
+                if (newScrollHeight == scrollHeight)
+                {
+                    break;
+                }
+                else
+                {
+                    scrollHeight = newScrollHeight;
+                    Thread.Sleep(400);
+                }
+            } while (true);
         }
-
-        public IList<IWebElement> GetElementsByXPath(string xPath)
-        {
-            return _driver.FindElements(By.XPath(xPath));
-        }
-
-        public IWebElement GetElementByXPath(string xPath, IWebElement webElement)
-        {
-            return _driver.FindElement(By.XPath(xPath));
-        }
-
-        public IList<IWebElement> GetElementsByXPath(string xPath, IWebElement webElement)
-        {
-            return webElement.FindElements(By.XPath(xPath));
-        }
-
-        public IWebElement GetElementByTagName(string tagName)
-        {
-            return _driver.FindElement(By.TagName(tagName));
-        }
-
-        public IList<IWebElement> GetElementsByTagName(string tagName)
-        {
-            return _driver.FindElements(By.TagName(tagName));
-        }
-
-        public IWebElement GetElementByTagName(string tagName, IWebElement webElement)
-        {
-            return webElement.FindElement(By.TagName(tagName));
-        }
-
-        public IList<IWebElement> GetElementsByTagName(string tagName, IWebElement webElement)
-        {
-            return webElement.FindElements(By.TagName(tagName));
-        }
-
-        public IWebElement GetElementByClassName(string className)
-        {
-            return _driver.FindElement(By.ClassName(className));
-        }
-
-        public IList<IWebElement> GetElementsByClassName(string className)
-        {
-            return _driver.FindElements(By.ClassName(className));
-        }
-
-        public IWebElement GetElementByClassName(string className, IWebElement webElement)
-        {
-            return webElement.FindElement(By.ClassName(className));
-        }
-
-        public IList<IWebElement> GetElementsByClassName(string className, IWebElement webElement)
-        {
-            return webElement.FindElements(By.ClassName(className));
-        }
-
-
-
-        #endregion
-
     }
 }

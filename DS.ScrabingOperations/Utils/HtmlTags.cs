@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.ScrabingOperations.Scraping
+namespace DS.Scraping.Utils
 {
     public static class HtmlTags
     {
 
-        public static string a="a";
+        public static string a = "a";
         public static string b = "b";
         public static string strong = "strong";
         public static string body = "body";

@@ -62,19 +62,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\KeyValue.cs" />
+    <Compile Include="Models\DataInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scraping\HtmlTags.cs" />
-    <Compile Include="Scraping\Selenium\BrowserScraping\ISeleniumBrowserScraping.cs" />
-    <Compile Include="Scraping\Selenium\BrowserScraping\SeleniumBrowserScraping.cs" />
-    <Compile Include="Scraping\Selenium\BrowserScraping\SeleniumChromeScraping.cs" />
-    <Compile Include="Scraping\Selenium\Browsers\IBrowser.cs" />
-    <Compile Include="Scraping\Selenium\ISeleniumScraping.cs" />
-    <Compile Include="Scraping\Selenium\Browsers\ABrowser.cs" />
-    <Compile Include="Scraping\Selenium\Browsers\ChromeBrowser.cs" />
-    <Compile Include="Scraping\Selenium\Browsers\EdgeBrowser.cs" />
-    <Compile Include="Scraping\Selenium\Browsers\FirefoxBrowser.cs" />
+    <Compile Include="Scraping\Selenium\ScrapingOperations\ChromeOperations.cs" />
+    <Compile Include="Scraping\Selenium\ScrapingOperations\ICommonScrapingOperations.cs" />
+    <Compile Include="Scraping\Selenium\Browser\ABrowserScraping.cs" />
+    <Compile Include="Scraping\Selenium\Browser\ChromeBrowser.cs" />
+    <Compile Include="Scraping\Selenium\ScrapingOperations\CommonScrapingOperations.cs" />
+    <Compile Include="Scraping\Selenium\Browser\ABrowser.cs" />
+    <Compile Include="Scraping\Selenium\Browser\IBrowserScraping.cs" />
     <Compile Include="Utils\Constants.cs" />
+    <Compile Include="Utils\HtmlTags.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ExternalFiles\Chrome\chromePort9222.bat">
