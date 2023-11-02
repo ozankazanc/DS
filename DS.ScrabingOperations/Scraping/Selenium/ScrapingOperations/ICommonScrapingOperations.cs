@@ -13,10 +13,12 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
     public interface ICommonScrapingOperations
     {
         DataTable GetData(DataInformation dataInformation, string url);
-        IWebElement GetElementBySearchOption(SearchOption dataInformation);
+        IWebElement GetElementBySearchOption(SearchOption elementInformation);
+        IWebElement GetElementBySearchOption(SearchOption elementInformation, IWebElement element);
+        IWebElement GetElementBySearchOption(SearchOption elementInformation, IWebElement element, int numerator);
         IList<IWebElement> GetElementsBySearchOption(SearchOption dataInformation, IWebElement mainElement);
+        string GetElementText(SearchOption searchOption, IWebElement element, int numerator = 0);
         string XPathNumerator(int num, string xPath);
-        string FindElementText(IWebElement element, SearchOption searchOption, int numerator = 0);
         void SetNextPageUrl(PageUrl url);
         void SetPrevPageUrl(PageUrl url);
     }

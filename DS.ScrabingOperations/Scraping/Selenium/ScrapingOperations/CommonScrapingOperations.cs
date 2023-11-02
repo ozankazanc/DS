@@ -32,20 +32,20 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
                 foreach (var columnInformation in dataInformation.ColumnInformations)
                     dataTable.Columns.Add(columnInformation.ColumnName, typeof(string));
             }
-
+            
             var mainElement = GetElementBySearchOption(dataInformation.MainElement);
             var subElements = GetElementsBySearchOption(dataInformation.SubElements, mainElement);
-
+           
             var numerator = 0;
             foreach (var element in subElements)
-            {
+            {   
                 var rowValues = new List<string>();
                 numerator++;
                 foreach (var columnInformation in dataInformation.ColumnInformations)
                 {
-                    var value = FindElementText(element, columnInformation, numerator);
+                    var value = GetElementText(columnInformation, element, numerator);
 
-                    if (!string.IsNullOrEmpty(value))
+                    if (value != null)
                         rowValues.Add(value);
                 }
 
@@ -67,23 +67,42 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
         }
         public IWebElement GetElementBySearchOption(SearchOption elementInformation)
         {
+            return GetElementBySearchOption(elementInformation, null);
+        }
+        public IWebElement GetElementBySearchOption(SearchOption elementInformation, IWebElement element)
+        {
+            return GetElementBySearchOption(elementInformation, null, 0);
+        }
+        public IWebElement GetElementBySearchOption(SearchOption elementInformation, IWebElement element, int numerator)
+        {
             IWebElement mainElement;
-
-            switch (elementInformation.SearchType)
+            try
             {
-                case SearchType.xPath:
-                    mainElement = _browser.GetElementByXPath(elementInformation.SearchValue);
-                    break;
-                case SearchType.TagName:
-                    mainElement = _browser.GetElementByTagName(elementInformation.SearchValue);
-                    break;
-                case SearchType.ClassName:
-                    mainElement = _browser.GetElementByClassName(elementInformation.SearchValue);
-                    break;
-                default:
-                    throw new NotImplementedException();
+                switch (elementInformation.SearchType)
+                {
+                    case SearchType.xPath:
+                        mainElement = _browser.GetElementByXPath(XPathNumerator(numerator, elementInformation.SearchValue), element);
+                        break;
+                    case SearchType.TagName:
+                        mainElement = _browser.GetElementByTagName(elementInformation.SearchValue, element);
+                        break;
+                    case SearchType.ClassName:
+                        mainElement = _browser.GetElementByClassName(elementInformation.SearchValue, element);
+                        break;
+                    default:
+                        throw new NotImplementedException($"Arama tipi bulunamadı.");
+                }
+                return mainElement;
             }
-            return mainElement;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message +
+                           $" | Hata ile karşılaşıldı." +
+                           $" SearchType: {elementInformation.SearchType} |" +
+                           $" SearchValue: {elementInformation.SearchValue}");
+            }
+
+            return null;
         }
         public IList<IWebElement> GetElementsBySearchOption(SearchOption searchOption, IWebElement mainElement)
         {
@@ -105,38 +124,12 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
             }
             return subElement;
         }
-        public string XPathNumerator(int num, string xPath)
+        public string GetElementText(SearchOption searchOption, IWebElement element, int numerator = 0)
         {
-            var addedNumXpath = xPath.Replace(Constants.ROWNUMBERINCREASEKEY, num.ToString());
-            return addedNumXpath;
+            var searchedElement = GetElementBySearchOption(searchOption, element, numerator);
+            return searchedElement == null ? null : searchedElement.Text;
         }
-        public string FindElementText(IWebElement element, SearchOption searchOption, int numerator = 0)
-        {
-            string value = string.Empty;
-            try
-            {
-                switch (searchOption.SearchType)
-                {
-                    case SearchType.xPath:
-                        value = element.FindElement(By.XPath(XPathNumerator(numerator, searchOption.SearchValue))).Text;
-                        break;
-                    case SearchType.TagName:
-                        value = element.FindElement(By.TagName(searchOption.SearchValue)).Text;
-                        break;
-                    case SearchType.ClassName:
-                        value = element.FindElement(By.ClassName(searchOption.SearchValue)).Text;
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
 
-            return value;
-        }
         public void SetNextPageUrl(PageUrl url)
         {
             var mainElement = GetElementBySearchOption(url);
@@ -174,5 +167,12 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
                 }
             } while (true);
         }
+        public string XPathNumerator(int num, string xPath)
+        {
+            var addedNumXpath = xPath.Replace(Constants.ROWNUMBERINCREASEKEY, num.ToString());
+            return addedNumXpath;
+        }
+
+
     }
 }

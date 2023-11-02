@@ -15,62 +15,80 @@ namespace DS.Scraping.Scraping.Selenium.Browser
         #region GetElementSide
         public IWebElement GetElementByXPath(string xPath)
         {
-            return _webDriver.FindElement(By.XPath(xPath));
+            return GetElementByXPath(xPath, null);
         }
 
         public IList<IWebElement> GetElementsByXPath(string xPath)
         {
-            return _webDriver.FindElements(By.XPath(xPath));
+            return GetElementsByXPath(xPath, null);
         }
 
         public IWebElement GetElementByXPath(string xPath, IWebElement webElement)
         {
-            return _webDriver.FindElement(By.XPath(xPath));
+            if (webElement == null)
+                return _webDriver.FindElement(By.XPath(xPath));
+            else
+                return webElement.FindElement(By.XPath(xPath));
         }
 
         public IList<IWebElement> GetElementsByXPath(string xPath, IWebElement webElement)
         {
-            return webElement.FindElements(By.XPath(xPath));
+            if (webElement == null)
+                return _webDriver.FindElements(By.XPath(xPath));
+            else
+                return webElement.FindElements(By.XPath(xPath));
         }
 
         public IWebElement GetElementByTagName(string tagName)
         {
-            return _webDriver.FindElement(By.TagName(tagName));
+            return GetElementByTagName(tagName, null);
         }
 
         public IList<IWebElement> GetElementsByTagName(string tagName)
         {
-            return _webDriver.FindElements(By.TagName(tagName));
+            return GetElementsByClassName(tagName, null);
         }
 
         public IWebElement GetElementByTagName(string tagName, IWebElement webElement)
         {
-            return webElement.FindElement(By.TagName(tagName));
+            if (webElement == null)
+                return _webDriver.FindElement(By.TagName(tagName));
+            else
+                return webElement.FindElement(By.TagName(tagName));
         }
 
         public IList<IWebElement> GetElementsByTagName(string tagName, IWebElement webElement)
         {
-            return webElement.FindElements(By.TagName(tagName));
+            if (webElement == null)
+                return _webDriver.FindElements(By.TagName(tagName));
+            else
+                return webElement.FindElements(By.TagName(tagName));
         }
 
         public IWebElement GetElementByClassName(string className)
         {
-            return _webDriver.FindElement(By.ClassName(className));
+            return GetElementByClassName(className, null);
         }
 
         public IList<IWebElement> GetElementsByClassName(string className)
         {
-            return _webDriver.FindElements(By.ClassName(className));
+            return GetElementsByClassName(className, null);
         }
 
         public IWebElement GetElementByClassName(string className, IWebElement webElement)
         {
-            return webElement.FindElement(By.ClassName(className));
+            if (webElement == null)
+                return _webDriver.FindElement(By.ClassName(className));
+            else
+                return webElement.FindElement(By.ClassName(className));
         }
 
         public IList<IWebElement> GetElementsByClassName(string className, IWebElement webElement)
         {
-            return webElement.FindElements(By.ClassName(className));
+            if (webElement == null)
+                return _webDriver.FindElements(By.ClassName(className));
+            else
+                return webElement.FindElements(By.ClassName(className));
         }
 
 

@@ -67,7 +67,7 @@
     <Compile Include="Scraping\Selenium\ScrapingOperations\ChromeOperations.cs" />
     <Compile Include="Scraping\Selenium\ScrapingOperations\ICommonScrapingOperations.cs" />
     <Compile Include="Scraping\Selenium\Browser\ABrowserScraping.cs" />
-    <Compile Include="Scraping\Selenium\Browser\ChromeBrowser.cs" />
+    <Compile Include="Scraping\Selenium\Browser\Concrete\ChromeBrowser.cs" />
     <Compile Include="Scraping\Selenium\ScrapingOperations\CommonScrapingOperations.cs" />
     <Compile Include="Scraping\Selenium\Browser\ABrowser.cs" />
     <Compile Include="Scraping\Selenium\Browser\IBrowserScraping.cs" />

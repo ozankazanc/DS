@@ -1,5 +1,6 @@
 ﻿using DS.Scraping.Models;
 using DS.Scraping.Scraping.Selenium.Browser;
+using DS.Scraping.Scraping.Selenium.Browser.Concrete;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;

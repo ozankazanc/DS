@@ -56,7 +56,7 @@ namespace DS.ConsoleUI.TestCompanies
                     MainElement = new ElementInformation { SearchType = SearchType.xPath, SearchValue = mainElementXpath },
                     SubElements = new ElementInformation { SearchType = SearchType.ClassName, SearchValue = subElementsClassName },
                     NextPageUrl = new PageUrl { SearchType = SearchType.ClassName, SearchValue = "pageNaviButtons" },
-                    MaxRow = 100,
+                    MaxRow = 40,
                     ColumnInformations = new List<ColumnInformation>
                     {
                         new ColumnInformation

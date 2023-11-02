@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.Scraping.Scraping.Selenium.Browser
+namespace DS.Scraping.Scraping.Selenium.Browser.Concrete
 {
     public class ChromeBrowser : ABrowser
     {
