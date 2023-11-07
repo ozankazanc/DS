@@ -25,7 +25,7 @@ namespace DS.ConsoleUI.TestCompanies
             try
             {
                 var mainElementXpath = "//*[@id=\"searchResultsTable\"]/tbody";
-                var subElementsClassName = "searchResultsItem";
+                var subElementsClassName = "searchResults";
                 var nextPageUrl = "//*[@id=\"searchResultsSearchForm\"]/div[1]/div[3]/div[3]/div[1]/ul/li[15]/a";
 
                 #region test
@@ -54,8 +54,8 @@ namespace DS.ConsoleUI.TestCompanies
                 var dataInformation = new DataInformation
                 {
                     MainElement = new ElementInformation { SearchType = SearchType.xPath, SearchValue = mainElementXpath },
-                    SubElements = new ElementInformation { SearchType = SearchType.ClassName, SearchValue = subElementsClassName },
-                    NextPageUrl = new PageUrl { SearchType = SearchType.ClassName, SearchValue = "pageNaviButtons" },
+                    SubElements = new List<ElementInformation> { new ElementInformation { SearchType = SearchType.TagName, SearchValue = HtmlTags.tr } },
+                    PaginationElement = new PaginationInformation { SearchType = SearchType.ClassName, SearchValue = "pageNaviButtons" },
                     MaxRow = 40,
                     ColumnInformations = new List<ColumnInformation>
                     {

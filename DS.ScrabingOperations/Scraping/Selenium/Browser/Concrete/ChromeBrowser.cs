@@ -20,9 +20,9 @@ namespace DS.Scraping.Scraping.Selenium.Browser.Concrete
         }
         public override void RunBrowser()
         {
-            base._webDriver = new ChromeDriver((ChromeDriverService)SetDriverSevice(), (ChromeOptions)SetOptions());
+            base._webDriver = new ChromeDriver((ChromeDriverService)SetDriverService(), (ChromeOptions)SetOptions());
         }
-        protected override DriverService SetDriverSevice()
+        protected override DriverService SetDriverService()
         {
             var service = ChromeDriverService.CreateDefaultService();
             service.HideCommandPromptWindow = true;
@@ -50,7 +50,7 @@ namespace DS.Scraping.Scraping.Selenium.Browser.Concrete
 
             base._webDriver = new ChromeDriver((ChromeOptions)SetOptions());
         }
-        protected override DriverService SetDriverSevice()
+        protected override DriverService SetDriverService()
         {
             throw new NotImplementedException();
         }

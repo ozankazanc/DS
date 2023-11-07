@@ -23,6 +23,17 @@ namespace DS.Scraping.Utils
         public static string p = "p";
         public static string span = "span";
         public static string article = "article";
+        public static string tr = "tr";
+        public static string td = "td";
+        public static string th = "th";
+        public static string table = "table";
+        public static string tbody = "tbody";
+        public static string thead = "thead";
+
+
+
+
+
 
     }
 }

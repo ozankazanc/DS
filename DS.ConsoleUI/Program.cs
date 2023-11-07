@@ -30,8 +30,11 @@ namespace DS.ConsoleUI
             //trendyol.TestIslemleri();
 
 
-            Sahibinden sahibinden = new Sahibinden();
-            sahibinden.TestIslemleri();
+            //Sahibinden sahibinden = new Sahibinden();
+            //sahibinden.TestIslemleri();
+
+            AmazonTR amazonTR = new AmazonTR();
+            amazonTR.TestIslemleri();
 
 
 

@@ -1,4 +1,5 @@
-﻿using DS.Scraping.Models;
+﻿using DS.ScrabingOperations.Utils;
+using DS.Scraping.Models;
 using DS.Scraping.Scraping;
 using DS.Scraping.Scraping.Selenium.Browser;
 using DS.Scraping.Utils;
@@ -17,6 +18,7 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
     {
         private ABrowser _browser;
         private DataTable dataTable;
+        private List<string> pageLinks;
         public CommonScrapingOperations(ABrowser testABrowser)
         {
             _browser = testABrowser;
@@ -26,44 +28,79 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
         {
             _browser.GoToUrl(url);
 
-            if (dataTable == null)
+            if (dataTable.IsNull())
             {
                 dataTable = new DataTable();
                 foreach (var columnInformation in dataInformation.ColumnInformations)
                     dataTable.Columns.Add(columnInformation.ColumnName, typeof(string));
             }
-            
+
             var mainElement = GetElementBySearchOption(dataInformation.MainElement);
-            var subElements = GetElementsBySearchOption(dataInformation.SubElements, mainElement);
-           
-            var numerator = 0;
+            var subElements = new List<IWebElement>();
+            foreach (var subElement in dataInformation.SubElements)
+                subElements.AddRange(GetElementsBySearchOption(subElement, mainElement).Cast<IWebElement>());
+
+            var numerator = dataInformation.StartRowIndex.HasValue ? (dataInformation.StartRowIndex.Value - 1) : 0;
             foreach (var element in subElements)
-            {   
+            {
                 var rowValues = new List<string>();
                 numerator++;
                 foreach (var columnInformation in dataInformation.ColumnInformations)
                 {
                     var value = GetElementText(columnInformation, element, numerator);
-
-                    if (value != null)
+                    //var attribute = GetElementAttributeValue(columnInformation, element, "class");
+                    if (value.IsNotNull() || columnInformation.AllowNullValue)
                         rowValues.Add(value);
                 }
 
                 //kayıt arasina alakasiz bir row girerse ekleme
                 if (rowValues.Count == dataTable.Columns.Count)
                     dataTable.Rows.Add(rowValues.ToArray());
-
             }
 
-            if (dataInformation.NextPageUrl != null && (dataInformation.MaxRow.HasValue && dataInformation.MaxRow.Value > dataTable.Rows.Count))
+            //hasNextPage
+            if (dataInformation.PaginationElement.IsNotNull())
+                dataInformation.PaginationElement.NextPageURL = GetNextPageUrl(dataInformation.PaginationElement);
+
+            if (!IsLastPageCheck(dataInformation.PaginationElement) && (dataInformation.MaxRow.HasValue && dataInformation.MaxRow.Value > dataTable.Rows.Count))
             {
-                SetNextPageUrl(dataInformation.NextPageUrl);
-                GetData(dataInformation, dataInformation.NextPageUrl.URL);
+                GetData(dataInformation, dataInformation.PaginationElement.NextPageURL);
             }
 
             _browser.CloseBrowser();
 
             return dataTable;
+        }
+        private bool IsLastPageCheck(PaginationInformation paginationElement)
+        {
+            var isLast = true;
+            if (paginationElement.IsNotNull())
+            {
+                if (pageLinks.IsNull())
+                {
+                    pageLinks = new List<string>();
+                    isLast = false;
+                }
+                else
+                {
+                    if (paginationElement.PagingKey.IsNull())
+                        isLast = pageLinks.Any(recordedPageUrl => recordedPageUrl == paginationElement.NextPageURL);
+                    else
+                        isLast = pageLinks.Any(recordedEditedPagingKey => recordedEditedPagingKey == paginationElement.GetEditedPagingKey);
+                }
+            }
+
+            if (!isLast)
+            {
+                if (paginationElement.PagingKey.IsNull())
+                    pageLinks.Add(paginationElement.NextPageURL);
+                else
+                    pageLinks.Add(paginationElement.GetEditedPagingKey);
+            }
+            else
+                pageLinks = null;
+
+            return isLast;
         }
         public IWebElement GetElementBySearchOption(SearchOption elementInformation)
         {
@@ -81,13 +118,16 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
                 switch (elementInformation.SearchType)
                 {
                     case SearchType.xPath:
-                        mainElement = _browser.GetElementByXPath(XPathNumerator(numerator, elementInformation.SearchValue), element);
+                        mainElement = _browser.GetElementByXPath(Helper.XPathNumerator(numerator, elementInformation.SearchValue), element);
                         break;
                     case SearchType.TagName:
                         mainElement = _browser.GetElementByTagName(elementInformation.SearchValue, element);
                         break;
                     case SearchType.ClassName:
                         mainElement = _browser.GetElementByClassName(elementInformation.SearchValue, element);
+                        break;
+                    case SearchType.CssSelector:
+                        mainElement = _browser.GetElementByCssSelector(elementInformation.SearchValue, element);
                         break;
                     default:
                         throw new NotImplementedException($"Arama tipi bulunamadı.");
@@ -119,6 +159,9 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
                 case SearchType.ClassName:
                     subElement = _browser.GetElementsByClassName(searchOption.SearchValue, mainElement);
                     break;
+                case SearchType.CssSelector:
+                    subElement = _browser.GetElementsByCssSelector(searchOption.SearchValue, mainElement);
+                    break;
                 default:
                     throw new NotImplementedException();
             }
@@ -127,10 +170,14 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
         public string GetElementText(SearchOption searchOption, IWebElement element, int numerator = 0)
         {
             var searchedElement = GetElementBySearchOption(searchOption, element, numerator);
-            return searchedElement == null ? null : searchedElement.Text;
+            return searchedElement.IsNull() ? null : searchedElement.Text;
         }
-
-        public void SetNextPageUrl(PageUrl url)
+        public string GetElementAttributeValue(SearchOption searchOption, IWebElement element, string attributeName, int numerator = 0)
+        {
+            var searchedElement = GetElementBySearchOption(searchOption, element, numerator);
+            return searchedElement.IsNull() ? null : searchedElement.GetAttribute(attributeName);
+        }
+        public string GetNextPageUrl(PaginationInformation url)
         {
             var mainElement = GetElementBySearchOption(url);
             var subElements = GetElementsBySearchOption(
@@ -140,10 +187,9 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
                     SearchValue = HtmlTags.a
                 },
                 mainElement);
-            var nextUrl = subElements.Last().GetAttribute("href");
-            url.URL = nextUrl;
+            return subElements.Last().GetAttribute("href");
         }
-        public void SetPrevPageUrl(PageUrl url)
+        public void SetPrevPageUrl(PaginationInformation url)
         {
             throw new NotImplementedException();
         }
@@ -167,11 +213,7 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
                 }
             } while (true);
         }
-        public string XPathNumerator(int num, string xPath)
-        {
-            var addedNumXpath = xPath.Replace(Constants.ROWNUMBERINCREASEKEY, num.ToString());
-            return addedNumXpath;
-        }
+
 
 
     }

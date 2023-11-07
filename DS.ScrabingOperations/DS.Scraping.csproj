@@ -72,6 +72,8 @@
     <Compile Include="Scraping\Selenium\Browser\ABrowser.cs" />
     <Compile Include="Scraping\Selenium\Browser\IBrowserScraping.cs" />
     <Compile Include="Utils\Constants.cs" />
+    <Compile Include="Utils\ExtensionsHelper.cs" />
+    <Compile Include="Utils\Helper.cs" />
     <Compile Include="Utils\HtmlTags.cs" />
   </ItemGroup>
   <ItemGroup>

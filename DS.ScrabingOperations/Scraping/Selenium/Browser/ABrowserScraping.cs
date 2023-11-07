@@ -1,9 +1,11 @@
-﻿using DS.Scraping.Models;
+﻿using DS.ScrabingOperations.Utils;
+using DS.Scraping.Models;
 using DS.Scraping.Scraping;
 using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +27,7 @@ namespace DS.Scraping.Scraping.Selenium.Browser
 
         public IWebElement GetElementByXPath(string xPath, IWebElement webElement)
         {
-            if (webElement == null)
+            if (webElement.IsNull())
                 return _webDriver.FindElement(By.XPath(xPath));
             else
                 return webElement.FindElement(By.XPath(xPath));
@@ -33,7 +35,7 @@ namespace DS.Scraping.Scraping.Selenium.Browser
 
         public IList<IWebElement> GetElementsByXPath(string xPath, IWebElement webElement)
         {
-            if (webElement == null)
+            if (webElement.IsNull())
                 return _webDriver.FindElements(By.XPath(xPath));
             else
                 return webElement.FindElements(By.XPath(xPath));
@@ -51,7 +53,7 @@ namespace DS.Scraping.Scraping.Selenium.Browser
 
         public IWebElement GetElementByTagName(string tagName, IWebElement webElement)
         {
-            if (webElement == null)
+            if (webElement.IsNull())
                 return _webDriver.FindElement(By.TagName(tagName));
             else
                 return webElement.FindElement(By.TagName(tagName));
@@ -59,7 +61,7 @@ namespace DS.Scraping.Scraping.Selenium.Browser
 
         public IList<IWebElement> GetElementsByTagName(string tagName, IWebElement webElement)
         {
-            if (webElement == null)
+            if (webElement.IsNull())
                 return _webDriver.FindElements(By.TagName(tagName));
             else
                 return webElement.FindElements(By.TagName(tagName));
@@ -77,7 +79,7 @@ namespace DS.Scraping.Scraping.Selenium.Browser
 
         public IWebElement GetElementByClassName(string className, IWebElement webElement)
         {
-            if (webElement == null)
+            if (webElement.IsNull())
                 return _webDriver.FindElement(By.ClassName(className));
             else
                 return webElement.FindElement(By.ClassName(className));
@@ -85,13 +87,37 @@ namespace DS.Scraping.Scraping.Selenium.Browser
 
         public IList<IWebElement> GetElementsByClassName(string className, IWebElement webElement)
         {
-            if (webElement == null)
+            if (webElement.IsNull())
                 return _webDriver.FindElements(By.ClassName(className));
             else
                 return webElement.FindElements(By.ClassName(className));
         }
 
+        public IWebElement GetElementByCssSelector(string cssSelector)
+        {
+            return GetElementByCssSelector(cssSelector, null);
+        }
 
+        public IList<IWebElement> GetElementsByCssSelector(string cssSelector)
+        {
+            return GetElementsByCssSelector(cssSelector, null);
+        }
+
+        public IWebElement GetElementByCssSelector(string cssSelector, IWebElement webElement)
+        {
+            if (webElement.IsNull())
+                return _webDriver.FindElement(By.CssSelector(cssSelector));
+            else
+                return webElement.FindElement(By.CssSelector(cssSelector));
+        }
+
+        public IList<IWebElement> GetElementsByCssSelector(string cssSelector, IWebElement webElement)
+        {
+            if (webElement.IsNull())
+                return _webDriver.FindElements(By.CssSelector(cssSelector));
+            else
+                return webElement.FindElements(By.CssSelector(cssSelector));
+        }
 
         #endregion
     }

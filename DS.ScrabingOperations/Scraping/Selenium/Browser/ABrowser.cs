@@ -13,7 +13,7 @@ namespace DS.Scraping.Scraping.Selenium.Browser
     {
         protected IWebDriver _webDriver;
         private const int STANDARTWAITINGTIME_WHENREACHINGURL = 1000;
-        protected abstract DriverService SetDriverSevice();
+        protected abstract DriverService SetDriverService();
         protected abstract DriverOptions SetOptions();
         public abstract void RunBrowser();
         public virtual void WaitWhileReachingUrl(int milisecond)
