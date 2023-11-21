@@ -1,4 +1,5 @@
-﻿using DS.ScrabingOperations.Utils;
+﻿using DS.ScrabingOperations.Models;
+using DS.ScrabingOperations.Utils;
 using DS.Scraping.Models;
 using DS.Scraping.Scraping;
 using DS.Scraping.Scraping.Selenium.Browser;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
 {
@@ -24,83 +26,148 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
             _browser = testABrowser;
         }
 
-        public DataTable GetData(DataInformation dataInformation, string url)
+        public DataTable GetDataWithMultiplePage(DataInformation dataInformation, string url)
         {
             _browser.GoToUrl(url);
 
-            if (dataTable.IsNull())
-            {
-                dataTable = new DataTable();
-                foreach (var columnInformation in dataInformation.ColumnInformations)
-                    dataTable.Columns.Add(columnInformation.ColumnName, typeof(string));
-            }
-
-            var mainElement = GetElementBySearchOption(dataInformation.MainElement);
-            var subElements = new List<IWebElement>();
-            foreach (var subElement in dataInformation.SubElements)
-                subElements.AddRange(GetElementsBySearchOption(subElement, mainElement).Cast<IWebElement>());
-
-            var numerator = dataInformation.StartRowIndex.HasValue ? (dataInformation.StartRowIndex.Value - 1) : 0;
-            foreach (var element in subElements)
-            {
-                var rowValues = new List<string>();
-                numerator++;
-                foreach (var columnInformation in dataInformation.ColumnInformations)
-                {
-                    var value = GetElementText(columnInformation, element, numerator);
-                    //var attribute = GetElementAttributeValue(columnInformation, element, "class");
-                    if (value.IsNotNull() || columnInformation.AllowNullValue)
-                        rowValues.Add(value);
-                }
-
-                //kayıt arasina alakasiz bir row girerse ekleme
-                if (rowValues.Count == dataTable.Columns.Count)
-                    dataTable.Rows.Add(rowValues.ToArray());
-            }
+            FillDataTableColumns(dataInformation.ColumnInformations);
+            var mainElement = GetMainElement(dataInformation.MainElement);
+            var subElements = GetSubElements(mainElement, dataInformation.SubElements);
+            FillDataTableValues(dataInformation, subElements, ref dataTable);
 
             //hasNextPage
+            MultiplePagesType multiplePagesType = null;
             if (dataInformation.PaginationElement.IsNotNull())
-                dataInformation.PaginationElement.NextPageURL = GetNextPageUrl(dataInformation.PaginationElement);
-
-            if (!IsLastPageCheck(dataInformation.PaginationElement) && (dataInformation.MaxRow.HasValue && dataInformation.MaxRow.Value > dataTable.Rows.Count))
             {
-                GetData(dataInformation, dataInformation.PaginationElement.NextPageURL);
+                multiplePagesType = (MultiplePagesType)dataInformation.PaginationElement;
+                multiplePagesType.NextPageURL = GetNextPageUrl(multiplePagesType);
+                dataInformation.PaginationElement = multiplePagesType;
             }
+
+            if (!IsLastPageCheck(multiplePagesType) && (dataInformation.MaxRow.HasValue && dataInformation.MaxRow.Value > dataTable.Rows.Count))
+            {
+                GetDataWithMultiplePage(dataInformation, multiplePagesType.NextPageURL);
+            }
+
+            AddLineNumberColumnInDataTable(ref dataTable);
 
             _browser.CloseBrowser();
 
             return dataTable;
         }
-        private bool IsLastPageCheck(PaginationInformation paginationElement)
+        public DataTable GetDataWithIncrementalLoad(DataInformation dataInformation, string url)
         {
-            var isLast = true;
-            if (paginationElement.IsNotNull())
+            _browser.GoToUrl(url);
+
+            FillDataTableColumns(dataInformation.ColumnInformations);
+            var mainElement = GetMainElement(dataInformation.MainElement);
+            var subElements = GetSubElements(mainElement, dataInformation.SubElements);
+
+            ScrollToBannerSideHeight(mainElement);
+
+            int elementCount = subElements.Count;
+            while (elementCount < dataInformation.MaxRow)
             {
-                if (pageLinks.IsNull())
-                {
-                    pageLinks = new List<string>();
-                    isLast = false;
-                }
+                if (elementCount == subElements.Count)
+                    _browser.ScrollDown(GetScrollDownHeight(mainElement, true));
                 else
+                    _browser.ScrollDown(GetScrollDownHeight(mainElement, false));
+
+                elementCount += subElements.Count;
+            }
+
+            mainElement = GetMainElement(dataInformation.MainElement);
+            subElements = GetSubElements(mainElement, dataInformation.SubElements);
+
+            FillDataTableValues(dataInformation, subElements, ref dataTable);
+            AddLineNumberColumnInDataTable(ref dataTable);
+            
+            _browser.CloseBrowser();
+
+            return dataTable;
+        }
+
+        public void GetInnerPageData(DataInformation dataInformation)
+        {
+            FillDataTableInnerPageColumns(dataInformation.InnerPageInformations);
+            var startColumnIndex = dataInformation.ColumnInformations.Count - 1;
+
+            var dtInnerPage = new DataTable();
+
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                var startIndex = startColumnIndex;
+                var link = dataTable.Rows[i]["Link"].IsNotNull() ? Convert.ToString(dataTable.Rows[i]["Link"]) : null;
+
+                if (link.IsNotNull())
                 {
-                    if (paginationElement.PagingKey.IsNull())
-                        isLast = pageLinks.Any(recordedPageUrl => recordedPageUrl == paginationElement.NextPageURL);
+                    _browser.GoToUrl(link);
+
+                }
+            }
+
+        }
+
+        public void FillDataTableColumns(List<ColumnInformation> columnInformations)
+        {
+            if (dataTable.IsNull())
+            {
+                dataTable = new DataTable();
+                dataTable.Columns.Add("Line", typeof(string));
+                foreach (var columnInformation in columnInformations)
+                    dataTable.Columns.Add(columnInformation.ColumnName, typeof(string));
+            }
+        }
+        public void FillDataTableInnerPageColumns(List<ColumnInformation> columnInformations)
+        {
+            dataTable = new DataTable();
+            dataTable.Columns.Add("Line", typeof(string));
+            foreach (var columnInformation in columnInformations)
+                dataTable.Columns.Add(columnInformation.ColumnName, typeof(string));
+        }
+        public void FillDataTableValues(DataInformation dataInformation, IList<IWebElement> subElements, ref DataTable dataTable)
+        {
+            var numerator = dataInformation.StartRowIndex.HasValue ? (dataInformation.StartRowIndex.Value - 1) : 0;
+            foreach (var element in subElements)
+            {
+                var rowValues = new List<string>() { "0" }; //"0" -> line için eklendi
+                numerator++;
+                foreach (var columnInformation in dataInformation.ColumnInformations)
+                {
+                    var elementValue = element;
+                    foreach (var searchInformation in columnInformation.SearchInformation)
+                    {
+                        elementValue = GetElementBySearchOption(searchInformation, elementValue, numerator);
+                    }
+
+                    string value = string.Empty;
+                    var lastSearchInformation = columnInformation.SearchInformation.LastOrDefault();
+
+                    if (lastSearchInformation.SearchType == SearchType.AttributeName)
+                        value = GetElementAttributeValue(elementValue, lastSearchInformation.SearchValue);
                     else
-                        isLast = pageLinks.Any(recordedEditedPagingKey => recordedEditedPagingKey == paginationElement.GetEditedPagingKey);
+                        value = GetElementText(elementValue);
+
+                    if (value.IsNotNull() || columnInformation.AllowNullValue)
+                        rowValues.Add(value);
                 }
-            }
 
-            if (!isLast)
-            {
-                if (paginationElement.PagingKey.IsNull())
-                    pageLinks.Add(paginationElement.NextPageURL);
-                else
-                    pageLinks.Add(paginationElement.GetEditedPagingKey);
+                //kayıt arasina alakasiz bir row girerse ekleme
+                if (rowValues.Count == (dataTable.Columns.Count))
+                    dataTable.Rows.Add(rowValues.ToArray());
             }
-            else
-                pageLinks = null;
+        }
+        public IWebElement GetMainElement(ElementInformation mainElementInformation)
+        {
+            return GetElementBySearchOption(mainElementInformation);
+        }
+        public IList<IWebElement> GetSubElements(IWebElement mainElement, List<ElementInformation> subElementInformations)
+        {
+            var subElements = new List<IWebElement>();
+            foreach (var subElementInformation in subElementInformations)
+                subElements.AddRange(GetElementsBySearchOption(subElementInformation, mainElement).Cast<IWebElement>());
 
-            return isLast;
+            return subElements;
         }
         public IWebElement GetElementBySearchOption(SearchOption elementInformation)
         {
@@ -128,6 +195,9 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
                         break;
                     case SearchType.CssSelector:
                         mainElement = _browser.GetElementByCssSelector(elementInformation.SearchValue, element);
+                        break;
+                    case SearchType.AttributeName:
+                        mainElement = element; //attribute için arama yapmiyoruz.
                         break;
                     default:
                         throw new NotImplementedException($"Arama tipi bulunamadı.");
@@ -170,14 +240,55 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
         public string GetElementText(SearchOption searchOption, IWebElement element, int numerator = 0)
         {
             var searchedElement = GetElementBySearchOption(searchOption, element, numerator);
-            return searchedElement.IsNull() ? null : searchedElement.Text;
+            return GetElementText(searchedElement);
+        }
+        public string GetElementText(IWebElement element)
+        {
+            return element.IsNull() ? null : element.Text;
         }
         public string GetElementAttributeValue(SearchOption searchOption, IWebElement element, string attributeName, int numerator = 0)
         {
             var searchedElement = GetElementBySearchOption(searchOption, element, numerator);
-            return searchedElement.IsNull() ? null : searchedElement.GetAttribute(attributeName);
+            return GetElementAttributeValue(searchedElement, attributeName);
         }
-        public string GetNextPageUrl(PaginationInformation url)
+        public string GetElementAttributeValue(IWebElement element, string attributeName)
+        {
+            return element.IsNull() ? null : element.GetAttribute(attributeName);
+        }
+        private bool IsLastPageCheck(MultiplePagesType paginationElement)
+        {
+            var isLast = true;
+            if (paginationElement.IsNotNull())
+            {
+                if (pageLinks.IsNull())
+                {
+                    pageLinks = new List<string>();
+                    isLast = false;
+                }
+                else
+                {
+                    if (paginationElement.PagingKey.IsNull())
+                        isLast = pageLinks.Any(recordedPageUrl => recordedPageUrl == paginationElement.NextPageURL);
+                    else
+                        isLast = pageLinks.Any(recordedEditedPagingKey => recordedEditedPagingKey == paginationElement.GetEditedPagingKey);
+                }
+            }
+            else
+                return isLast;
+
+            if (!isLast)
+            {
+                if (paginationElement.PagingKey.IsNull())
+                    pageLinks.Add(paginationElement.NextPageURL);
+                else
+                    pageLinks.Add(paginationElement.GetEditedPagingKey);
+            }
+            else
+                pageLinks = null;
+
+            return isLast;
+        }
+        public string GetNextPageUrl(MultiplePagesType url)
         {
             var mainElement = GetElementBySearchOption(url);
             var subElements = GetElementsBySearchOption(
@@ -189,7 +300,7 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
                 mainElement);
             return subElements.Last().GetAttribute("href");
         }
-        public void SetPrevPageUrl(PaginationInformation url)
+        public void SetPrevPageUrl(MultiplePagesType url)
         {
             throw new NotImplementedException();
         }
@@ -202,6 +313,8 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
                 IJavaScriptExecutor js = (IJavaScriptExecutor)_browser;
                 var newScrollHeight = (long)js.ExecuteScript("window.scrollTo(0, document.body.scrollHeight); return document.body.scrollHeight;");
 
+                // var newScrollHeight = (long)js.ExecuteScript("window.scrollTo(0, document.body.scrollHeight); return document.body.scrollHeight;");
+
                 if (newScrollHeight == scrollHeight)
                 {
                     break;
@@ -213,8 +326,22 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
                 }
             } while (true);
         }
-
-
-
+        public void ScrollToBannerSideHeight(IWebElement mainElement)
+        {
+            _browser.ScrollDown(mainElement.Location.Y);
+            _browser.WaitWhileReachingUrl(2000);
+        }
+        public int GetScrollDownHeight(IWebElement mainElement, bool firstScroll)
+        {
+            if (firstScroll)
+                return mainElement.Size.Height - (mainElement.Size.Height / 4);
+            else
+                return mainElement.Size.Height;
+        }
+        public void AddLineNumberColumnInDataTable(ref DataTable dataTable)
+        {
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+                dataTable.Rows[i]["Line"] = (i + 1).ToString();
+        }
     }
 }

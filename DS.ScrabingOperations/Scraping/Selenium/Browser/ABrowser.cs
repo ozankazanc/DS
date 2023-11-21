@@ -20,7 +20,7 @@ namespace DS.Scraping.Scraping.Selenium.Browser
         {
             Thread.Sleep(milisecond);
         }
-        public void CloseBrowser()
+        public virtual void CloseBrowser()
         {
             _webDriver.Quit();
         }
@@ -32,6 +32,14 @@ namespace DS.Scraping.Scraping.Selenium.Browser
         {
             _webDriver.Navigate().GoToUrl(url);
             WaitWhileReachingUrl(waitingTimeMs);
+        }
+        long lastHeight = 0;
+        public virtual void ScrollDown(int height)
+        {
+            IJavaScriptExecutor js = (IJavaScriptExecutor)_webDriver;
+            var point = (long)js.ExecuteScript($"window.scrollTo({lastHeight},{height}); return document.body.scrollHeight;");
+            lastHeight += height;
+            WaitWhileReachingUrl(2000);
         }
 
 

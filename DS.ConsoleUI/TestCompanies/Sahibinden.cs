@@ -1,4 +1,5 @@
-﻿using DS.Scraping.Models;
+﻿using DS.ScrabingOperations.Models;
+using DS.Scraping.Models;
 using DS.Scraping.Scraping.Selenium;
 using DS.Scraping.Scraping.Selenium.ScrapingOperations;
 using DS.Scraping.Utils;
@@ -99,7 +100,7 @@ namespace DS.ConsoleUI.TestCompanies
 
                 };
 
-                scraping.Run(dataInformation,Url);
+                scraping.RunWithMultiplePage(dataInformation,Url);
             }
             finally
             {

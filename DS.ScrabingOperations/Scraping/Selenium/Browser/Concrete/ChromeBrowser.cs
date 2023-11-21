@@ -60,6 +60,14 @@ namespace DS.Scraping.Scraping.Selenium.Browser.Concrete
             options.DebuggerAddress = "localhost:9222";
             return options;
         }
+
+        public override void CloseBrowser()
+        {
+            Process[] chromeInstances = Process.GetProcessesByName("chrome");
+
+            foreach (Process p in chromeInstances)
+                p.Kill();
+        }
         private void RunLocalBrowser()
         {
             var outPutDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

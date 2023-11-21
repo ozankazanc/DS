@@ -66,9 +66,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestCompanies\AmazonTR.cs" />
-    <Compile Include="TestCompanies\Sahibinden.cs" />
-    <Compile Include="TestCompanies\Trendyol.cs" />
+    <Compile Include="TestCompanies\CicekSepeti.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

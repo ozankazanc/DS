@@ -14,12 +14,19 @@ namespace DS.Scraping.Scraping.Selenium.ScrapingOperations
     public class ChromeOperations
     {
 
-        public void Run(DataInformation dataInformation, string url)
+        public void RunWithMultiplePage(DataInformation dataInformation, string url)
         {
             var chromeOperations = new CommonScrapingOperations(new ChromeLocalBrowser());
-            chromeOperations.GetData(dataInformation, url);
+            chromeOperations.GetDataWithMultiplePage(dataInformation, url);
 
         }
-        
+
+        public void RunWithIncrementalLoad(DataInformation dataInformation, string url)
+        {
+            var chromeOperations = new CommonScrapingOperations(new ChromeLocalBrowser());
+            chromeOperations.GetDataWithIncrementalLoad(dataInformation, url);
+
+        }
+
     }
 }

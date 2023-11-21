@@ -1,4 +1,5 @@
-﻿using DS.ScrabingOperations.Utils;
+﻿using DS.ScrabingOperations.Models;
+using DS.ScrabingOperations.Utils;
 using DS.Scraping.Models;
 using DS.Scraping.Scraping.Selenium.ScrapingOperations;
 using DS.Scraping.Utils;
@@ -44,7 +45,7 @@ namespace DS.ConsoleUI.TestCompanies
                             SearchValue = Helper.SetXpathSearchByClassName(HtmlTags.div, "sg-col-4-of-24 sg-col-4-of-12 s-result-item s-asin sg-col-4-of-16 sg-col s-widget-spacing-small sg-col-4-of-20")
                         }
                     },
-                    PaginationElement = new PaginationInformation
+                    PaginationElement = new MultiplePagesType
                     {
                         SearchType = SearchType.ClassName,
                         SearchValue = "s-pagination-strip",
@@ -85,7 +86,7 @@ namespace DS.ConsoleUI.TestCompanies
                     }
                 };
 
-                scraping.Run(dataInformation, Url);
+                scraping.RunWithMultiplePage(dataInformation, Url);
             }
             finally
             {

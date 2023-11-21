@@ -62,7 +62,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\ColumnInformation.cs" />
     <Compile Include="Models\DataInformation.cs" />
+    <Compile Include="Models\ElementInformation.cs" />
+    <Compile Include="Models\LinkColumnInformation.cs" />
+    <Compile Include="Models\PageDataInformation.cs" />
+    <Compile Include="Models\PaginationInformation.cs" />
+    <Compile Include="Models\SearchOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scraping\Selenium\ScrapingOperations\ChromeOperations.cs" />
     <Compile Include="Scraping\Selenium\ScrapingOperations\ICommonScrapingOperations.cs" />

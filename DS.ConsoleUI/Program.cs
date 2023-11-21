@@ -24,6 +24,8 @@ namespace DS.ConsoleUI
 
 
 
+            CicekSepeti trendyol = new CicekSepeti();
+            trendyol.TestIslemleri();
 
 
             //Trendyol trendyol = new Trendyol();
@@ -33,8 +35,8 @@ namespace DS.ConsoleUI
             //Sahibinden sahibinden = new Sahibinden();
             //sahibinden.TestIslemleri();
 
-            AmazonTR amazonTR = new AmazonTR();
-            amazonTR.TestIslemleri();
+            //AmazonTR amazonTR = new AmazonTR();
+            //amazonTR.TestIslemleri();
 
 
 
